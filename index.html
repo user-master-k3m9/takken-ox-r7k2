@@ -208,6 +208,21 @@ mark{background:linear-gradient(transparent 45%,var(--hl) 45%);color:inherit;pad
 .step b{display:block;font-family:var(--display);font-size:15px;line-height:1.2}
 .step small{display:block;font-size:11px;color:var(--muted);line-height:1.3}
 .steps .arrow{color:var(--muted)}
+.goro8{font-family:var(--display);font-size:clamp(16px,4.2vw,19px);line-height:1.7;text-align:center;padding:10px 8px 14px}
+.goro8 b{color:var(--maru)}
+.goro{border-radius:12px;padding:10px 14px;background:var(--hl-fill);font-size:14px;line-height:1.75}
+.goro .lbl{display:block;font-size:12px;color:var(--muted);letter-spacing:.06em}
+.goro .g{font-family:var(--display);font-size:16px}
+.goro .g b{color:var(--maru)}
+.resume{display:flex;flex-direction:column;gap:8px}
+.resume h2{font-size:16px}
+.resitem{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--fc);border-radius:12px;padding:10px 12px}
+.resitem .t{font-weight:700;font-size:15px;line-height:1.4;min-width:0}
+.resitem .t small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.resitem .btn{padding:8px 14px;font-size:14px}
+.resitem .ghost{font-size:12px}
+.qtools{display:flex;justify-content:flex-end;gap:8px;margin-top:-10px}
+.qtools .ghost{font-size:12px;padding:4px 12px}
 </style>
 </head>
 <body>
@@ -392,6 +407,19 @@ Object.assign(FIGS,{
     R(80,122,180,40,"ax")+T(170,140,"換地処分の公告の翌日","b")+T(170,156,"換地がもとの土地とみなされる","sm")+
     L(266,100,266,116,"ln d")+L(74,100,74,116,"ln d")+L(74,116,266,116,"ln d")+Ar(170,116,170,122))}
 });
+/* 8種制限 */
+const GORO8=`<b>菓子</b>は、<b>割</b>れた<b>栗</b>。<b>他人</b>の<b>所</b>。<b>手</b>を<b>付</b>けて<b>損</b>した。`;
+FIGS.hasshu={cap:"8種制限がかかるのは「業者が売主 × 素人が買主」のときだけ",html:()=>
+  `<div class="goro8">${GORO8}</div>`+
+  tbl(["覚え方","制限の名前","ポイント"],[
+  ["菓子","契約不適合責任（昔の「瑕疵担保責任」）の特約の制限","民法より買主に不利な特約は無効。ただし通知期間を「引渡しから2年以上」とする特約はOK"],
+  ["割れた","割賦販売契約の解除等の制限","分割払いが遅れても、30日以上の期間を決めて書面で催告しないと解除・一括請求できない"],
+  ["栗","クーリング・オフ","事務所など以外で申し込んだら、書面で告げられた日から8日以内は書面で白紙撤回できる"],
+  ["他人","自己の所有に属しない物件の売買の制限","他人の物件や未完成物件は原則売れない（取得契約・保全措置があれば例外）"],
+  ["所","所有権留保等の禁止","割賦販売で代金の30%をこえて受け取ったら、登記などを移さなければならない"],
+  ["手を","手付の額の制限等","手付は代金の20%まで。必ず解約手付として扱う"],
+  ["付けて","手付金等の保全措置","未完成は5%超または1,000万円超、完成は10%超または1,000万円超なら、受け取る前に保全"],
+  ["損した","損害賠償額の予定等の制限","損害賠償の予定＋違約金は合わせて代金の20%まで（こえた部分は無効）"]])};
 
 /* ---------- 問題 ---------- */
 const Q=[
@@ -453,8 +481,8 @@ const Q=[
  pt:"業者が売主・素人が買主 → 手付金は代金の20%まで",
  hon:"宅地建物取引業者Aが自ら売主として、宅建業者でないBと代金3,000万円の建物の売買契約を締結する際、Aは、Bから手付金700万円を受領することができる。",
  w:[["手付金","てつけきん","契約のしるしに先に払うお金。原則として、相手が準備を始める前ならこれを手放して契約をやめられる"]]},
-{c:"gyo",q:"手付金を代金の20%までにするなどの「8種制限」は、宅建業者どうしの取引でも同じように守らなければならない。",a:false,
- exp:`<p>8種制限（はっしゅせいげん）は、<b>プロ（宅建業者）が売主で、素人（ふつうの人）が買主</b>のときだけのルールです。</p><p>素人は知識が少ないので、損をしないように守ってあげる必要があります。でも<mark>プロどうしの取引なら、お互いに知識があるので、8種制限はかかりません</mark>。</p><p>クーリング・オフや手付金20%のルールも、この8種制限の仲間です。</p>`,
+{c:"gyo",q:"手付金を代金の20%までにするなどの「8種制限」は、宅建業者どうしの取引でも同じように守らなければならない。",a:false,fig:"hasshu",
+ exp:`<p><b>8種制限（はっしゅせいげん）</b>は、<mark>宅建業者が「売主」で、宅建業者でない人（素人）が「買主」のときだけ</mark>かかる、8つの特別なルールです。「自ら売主制限」とも呼ばれます。</p><p>プロと素人では、知識や経験に大きな差があります。何も決めなければ、プロに有利な契約を結ばされてしまうかもしれません。そこで法律が、<b>買主の素人を守るための8つの決まり</b>を作りました。</p><p>反対に、<b>宅建業者どうしの取引</b>なら、お互いにプロなので、8種制限は<b>かかりません</b>。また、業者が<b>買主</b>の場合や、業者が<b>なかだち（媒介・代理）</b>をしているだけの場合も、かかりません。</p><p>8つの中身は下の表のとおりです。どれも「素人の買主が損をしないため」という目的から考えると、覚えやすくなります。</p>`,
  pt:"8種制限は「業者が売主 × 業者でない人が買主」のときだけ",
  hon:"宅地建物取引業者相互間の取引においても、手付の額の制限等のいわゆる8種制限の規定が適用される。"},
 {c:"gyo",q:"1,000万円の土地の売買をなかだちした宅建業者が、売主から受け取れる報酬（手数料）の上限は、36万円（＋消費税）である。",a:true,fig:"hoshu",
@@ -1711,8 +1739,161 @@ Q.push(
  hon:"建築工事完了後1年6か月を経過した未使用の住宅は、新築と表示することができる。（→ 誤り）"}
 );
 
+/* 8種制限：割賦販売・所有権留保 */
+Q.push(
+{c:"gyo",lv:3,a:false,fig:"hasshu",
+ q:"業者が売主、ふつうの人が買主の分割払いの売買で、買主の支払いが1回でも遅れたら、業者はすぐに契約を解除できる。",
+ exp:`<p>分割払いの売買を<b>割賦販売（かっぷはんばい）</b>といいます。8種制限の「<b>割れた</b>」にあたります。</p><p>1回遅れただけで解除されたり、残りを一度に払えと言われたりしたら、買主は家を失ってしまいます。</p><p>そこで、業者は<mark>30日以上の期間を決めて、書面で「払ってください」と催告</mark>し、それでも払われないときでないと、<b>解除も、残りの一括請求もできません</b>。これより買主に不利な特約は無効です。</p>`,
+ pt:"割賦販売：30日以上の期間を定めた書面の催告をしないと、解除・一括請求できない",
+ hon:"宅地建物取引業者は、自ら売主となる宅地の割賦販売の契約について、賦払金の支払の義務が履行されない場合においては、30日以上の相当の期間を定めてその支払を書面で催告し、その期間内にその義務が履行されないときでなければ、契約を解除することができない。"},
+{c:"gyo",lv:3,a:true,fig:"hasshu",
+ q:"業者が売主の分割払いの売買で、買主から代金の30%をこえるお金を受け取ったら、業者は原則として、物件の所有権の登記などを買主に移さなければならない。",
+ exp:`<p>分割払いのとき、業者が「全部払い終わるまで登記は渡さない」としておくことを<b>所有権留保</b>といいます。8種制限の「<b>所</b>」にあたります。</p><p>でも、たくさん払ったのに登記がずっと業者の名前のままだと、業者がつぶれたときなどに買主が困ります。</p><p>そこで、<mark>代金の30%をこえる額を受け取るまで</mark>は留保してよいですが、それをこえたら、原則として<b>登記などを移さなければなりません</b>（残りの代金について買主が抵当権などの担保を用意できない場合などは例外）。</p>`,
+ pt:"所有権留保：代金の30%をこえて受け取ったら、原則として登記を移す",
+ hon:"宅地建物取引業者は、自ら売主として宅地の割賦販売を行った場合には、当該割賦販売に係る宅地を買主に引き渡すまで（代金の額の10分の3を超える額の金銭の支払を受けるまでに引き渡す場合は、10分の3を超える額の支払を受けるまで）に、登記その他引渡し以外の売主の義務を履行しなければならない。"}
+);
+/* 8種制限に関係する宅建業法の問題に「覚え方」を付ける */
+Q.forEach(q=>{
+  if(q.c!=="gyo"||q.fig==="hasshu")return;
+  const t=q.q+q.pt;
+  if(/クーリング|手付|保全措置|損害賠償の予定|契約不適合|自己の所有に属しない|他人のもの|8種|割賦|分割払い/.test(t))
+    q.goro=q.goro||{t:"8種制限の覚え方",g:GORO8,n:"菓子＝契約不適合責任／割れた＝割賦販売／栗＝クーリング・オフ／他人＝他人物売買／所＝所有権留保／手を付けて＝手付の額・手付金の保全／損した＝損害賠償の予定"};
+});
+
 /* 追加問題に番号をふる（旧問題の番号はそのまま） */
 (function(){const mx={};Q.forEach(q=>{if(q.id){const n=+q.id.split("-")[1];mx[q.c]=Math.max(mx[q.c]||0,n)}});Q.forEach(q=>{if(!q.id){mx[q.c]=(mx[q.c]||0)+1;q.id=q.c+"-"+mx[q.c]}})})();
+/* まとめ表（磨き上げで追加） */
+Object.assign(FIGS,{
+  ishi:{cap:"「だれが悪いか」で、第三者が守られるかどうかが変わる",html:()=>tbl(["種類","契約の効果","守られる第三者"],[
+    ["心裡留保（冗談・ウソを1人で）","原則有効（相手が知り、知り得たら無効）","善意の第三者"],
+    ["虚偽表示（2人でしめし合わせたウソ）","無効","善意の第三者（無過失は不要）"],
+    ["錯誤（大事な勘違い）","取り消せる（重大な過失があれば原則不可）","善意・無過失の第三者"],
+    ["詐欺（だまされた）","取り消せる","善意・無過失の第三者"],
+    [`<span class="hit">強迫（おどされた）</span>`,"取り消せる",`<span class="hit">守られない（強迫された人の勝ち）</span>`]])},
+  jiko:{cap:"「知った時から」と「できる時から」の2本立てが多い",html:()=>tbl(["時効の種類","期間"],[
+    ["取得時効（善意・無過失で始めた）","10年"],["取得時効（それ以外）","20年"],
+    ["債権の消滅時効","知った時から5年／使える時から10年"],
+    ["不法行為の損害賠償","知った時から3年（生命・身体は5年）／行為の時から20年"],
+    ["契約不適合（種類・品質）の通知","知った時から1年以内に通知"]])},
+  seigen:{cap:"判断する力が弱い順に、守られ方が強くなる",html:()=>tbl(["","どんな人","ひとりでした契約"],[
+    ["未成年者","18歳未満","親の同意がなければ取り消せる（おこづかいの範囲などは別）"],
+    ["成年被後見人","判断する力がほとんどない",`<span class="hit">同意があっても取り消せる</span>（日用品の買い物は別）`],
+    ["被保佐人","判断する力がかなり弱い","不動産の売買など大事な行為は、保佐人の同意がなければ取り消せる"],
+    ["被補助人","判断する力が少し弱い","家庭裁判所が決めた行為だけ、補助人の同意が必要"]])},
+  kyoyu:{cap:"する事の重さで、必要な賛成の数が変わる",html:()=>tbl(["すること","例","必要な賛成"],[
+    ["保存","雨もりの修理、不法に住む人を追い出す","1人でできる"],
+    ["管理","短い期間貸す、軽い変更","持分の価格の過半数"],
+    ["変更（重大なもの）","売る、建て替える、長い期間貸す",`<span class="hit">全員の同意</span>`]])},
+  kigen:{cap:"宅建業法の「期限」まとめ",html:()=>tbl(["こんなとき","期限"],[
+    ["名簿の登載事項が変わった（商号・役員・専任宅建士など）","30日以内に変更の届出"],
+    ["宅建業をやめた（死亡・合併・破産・廃業）","30日以内に届出"],
+    ["案内所で業務を始める","業務開始の10日前までに届出"],
+    ["免許の更新","満了の90日前〜30日前に申請"],
+    ["営業保証金・弁済業務保証金の不足","通知から2週間以内"],
+    ["保証協会の社員が事務所を新設","2週間以内に分担金"],
+    ["保証協会の社員でなくなった",`<span class="hit">1週間以内</span>に営業保証金を供託`],
+    ["専任媒介／専属専任媒介の報告","2週間に1回／1週間に1回以上"],
+    ["レインズ登録（専任／専属専任）","7日以内／5日以内（休業日を除く）"],
+    ["クーリング・オフ","書面で告げられた日から8日間"]])},
+  t3537:{cap:"35条は「契約の前に説明」、37条は「契約の後に交付」",html:()=>tbl(["","35条書面（重要事項説明）","37条書面（契約書面）"],[
+    ["いつ","契約が成立する前","契約が成立した後、遅れずに"],
+    ["だれに","買主・借主（売主・貸主には不要）","契約した両方の当事者"],
+    ["宅建士の説明","必要（相手が宅建業者なら書面だけでよい）","不要（記名だけ）"],
+    ["宅建士の記名","必要","必要"],
+    ["代金の額","書かない（代金以外のお金は書く）","必ず書く"],
+    ["電子データで渡す","相手の承諾があればOK","相手の承諾があればOK"]])},
+  boka:{cap:"防火地域のほうが厳しい（3階・100㎡）。準防火地域は4階・1,500㎡",html:()=>tbl(["","耐火建築物等にしなければならない建物"],[
+    ["防火地域","3階以上、または延べ面積100㎡超"],["準防火地域","4階以上、または延べ面積1,500㎡超"]])},
+  menzei:{cap:"この金額「未満」なら税金がかからない",html:()=>tbl(["","土地","家屋"],[
+    ["不動産取得税","10万円","建築：23万円（1戸）／売買など：12万円（1戸）"],
+    ["固定資産税","30万円","20万円"]])},
+  chika:{cap:"名前・時点・決める人をセットで",html:()=>tbl(["","地価公示","都道府県地価調査"],[
+    ["いつの時点","毎年1月1日","毎年7月1日"],["だれが","土地鑑定委員会（国）","都道府県知事"],
+    ["対象","標準地","基準地"],["鑑定する人","2人以上の不動産鑑定士","1人以上の不動産鑑定士"]])},
+  kantei:{cap:"3つを組み合わせて値段を決める",html:()=>tbl(["手法","考え方","求めた値段の名前"],[
+    ["原価法","今つくったらいくらか（再調達原価）－古くなった分（減価修正）","積算価格"],
+    ["取引事例比較法","近くの似た物件がいくらで売れたか","比準価格"],
+    ["収益還元法","これからいくら稼げるか（自分で使う物件にも使える）","収益価格"]])},
+  kekkaku:{cap:"免許を受けられない主な人（欠格事由）",html:()=>tbl(["こんな人","いつまでダメ？"],[
+    ["拘禁刑以上の刑を受けた（罪の種類は問わない）","執行が終わってから5年"],
+    ["宅建業法違反・暴力的な犯罪・背任で罰金","執行が終わってから5年"],
+    ["不正な手段で免許を取って取り消された","取消しから5年"],
+    ["暴力団員・暴力団員でなくなって5年たたない人","5年"],
+    ["破産して、まだ復権していない人","復権すればすぐOK"],
+    [`<span class="hit">執行猶予がついた</span>`,`<span class="hit">猶予期間中はダメ。満了すればすぐOK</span>`]])},
+  iryu:{cap:"遺留分は兄弟姉妹にはない",html:()=>tbl(["相続人","全体の遺留分"],[
+    ["親（直系尊属）だけ","財産の1/3"],["それ以外（配偶者や子がいる）","財産の1/2"],["兄弟姉妹",`<span class="hit">なし</span>`]])}
+});
+
+/* 覚え方とまとめ表を、内容に合う問題に付ける（磨き上げ） */
+(function(){
+  const G=(t,g,n)=>({t,g,n});
+  /* [分野, 合う問題のことば, 覚え方, まとめ表(図が無い問題だけ)] */
+  const R=[
+    ["gyo",/8種|クーリング|手付金|手付を|手付は|保全措置|損害賠償の予定|契約不適合|自己の所有に属しない|他人のもの|割賦|分割払い/,null,null],
+    ["gyo",/専属専任|専任媒介|一般媒介|媒介契約|レインズ|指定流通機構/,G("媒介契約の覚え方","専任さんは<b>2</b>週間ごと、専属さんは一途に<b>毎週</b>。レインズは専任<b>ナナ</b>日、専属<b>ゴ</b>日","専任＝報告2週間に1回・登録7日以内／専属専任＝報告1週間に1回・登録5日以内。どちらも有効期間は3か月まで"),"baikai"],
+    ["gyo",/重要事項|35条|37条|宅建士証を見せ/,G("35条・37条の覚え方","<b>さんご</b>（35）は<b>前</b>、<b>さんなな</b>（37）は<b>後</b>","35条＝契約の前に説明、37条＝契約の後に交付。37条の必ず書くこと：当事者・物件・代金・引渡し時期・登記の時期"),"t3537"],
+    ["gyo",/報酬|手数料/,G("報酬の覚え方","<b>ゴ・シ・サン</b>、たす<b>2万</b>・<b>6万</b>","200万円まで5%／200〜400万円は4%＋2万円／400万円超は3%＋6万円（速算式）。貸し借りは合計で家賃1か月分"),null],
+    ["gyo",/営業保証金|供託所/,G("営業保証金の覚え方","<b>千</b>の本店、<b>五百</b>の支店。有価証券は「国債<b>10</b>割・地方債<b>9</b>割・その他<b>8</b>割」","本店1,000万円・支店500万円。保証協会なら本店60万円・支店30万円"),"hosho"],
+    ["gyo",/保証協会|分担金/,G("保証協会の覚え方","<b>ロク</b>（60万）に<b>サン</b>（30万）。困ったら<b>2</b>週間、やめたら<b>1</b>週間","分担金は本店60万円・支店30万円。不足や新設は2週間以内、社員でなくなったら1週間以内に営業保証金"),"hoshoK"],
+    ["gyo",/亡くなった|合併|破産|廃業|商号|変更の届出/,G("期限の覚え方","届出は<b>サンジュウ</b>（30日）","名簿の変更も、宅建業をやめたときも、届出は30日以内"),"kigen"],
+    ["gyo",/拘禁刑|罰金|執行猶予|免許を受けられない/,G("欠格の覚え方","悪いことをしたら<b>ゴ</b>年待つ。でも<b>執行猶予</b>は満了ですぐOK","拘禁刑以上・宅建業法違反などの罰金 → 5年。執行猶予は期間満了でその日からOK"),"kekkaku"],
+    ["gyo",/有効期間|宅建士証/,G("「5」の覚え方","宅建は<b>ゴ</b>（5）がいっぱい","免許も宅建士証も有効期間は5年。専任の宅建士は5人に1人以上。欠格も5年"),null],
+    ["gyo",/案内所|帳簿|従業者|標識/,null,"kigen"],
+    ["ken",/詐欺|強迫|虚偽|しめし合わせ|冗談|勘違い|錯誤|心裡留保/,G("意思表示の覚え方","<b>おどされた人</b>は最強、<b>ウソをついた人</b>は最弱","強迫は第三者にも勝てる。虚偽表示（2人でウソ）は善意の第三者に負ける（無過失いらない）。詐欺・錯誤の第三者は善意＋無過失が必要"),"ishi"],
+    ["ken",/未成年|被後見人|被保佐人|成年年齢|20歳になるまで/,G("制限行為能力者の覚え方","<b>イッパチ</b>（18）で大人","成年は18歳から。成年被後見人は同意があっても取り消せる"),"seigen"],
+    ["ken",/時効|10年間おだやか|何年使い続けても/,G("時効の覚え方","取得時効は善意<b>ジュウ</b>（10）・悪意<b>ニジュウ</b>（20）。お金は知って<b>ゴ</b>（5）・知らずに<b>ジュウ</b>（10）","不法行為は知って3年（生命・身体は5年）・行為から20年"),"jiko"],
+    ["ken",/法定相続分|相続する場合|相続分|妻と夫の親|妻と夫の兄弟/,G("相続分の覚え方","「<b>こ</b>ども」2文字、「<b>そふぼ</b>」3文字、「<b>きょうだい</b>」…の数え方で分母が<b>2・3・4</b>","子と一緒なら配偶者1/2、親と一緒なら2/3、兄弟姉妹と一緒なら3/4。相手方の取り分が1/2→1/3→1/4（よく使われる「子・祖父母・兄弟姉妹」の分母の覚え方）"),"souzoku"],
+    ["ken",/遺留分/,G("遺留分の覚え方","親だけなら<b>3分の1</b>、それ以外は<b>2分の1</b>、兄弟姉妹は<b>ゼロ</b>",""),"iryu"],
+    ["ken",/連帯保証|保証人/,G("連帯保証人の覚え方","連帯保証人は「<b>サ・ケ・ブ</b>」なし","催告の抗弁権・検索の抗弁権・分別の利益（保証人が複数いても頭割りにならない）がない"),null],
+    ["ken",/抵当権|物上代位|法定地上権|競売/,G("抵当権の性質の覚え方","抵当権に<b>付</b>・<b>随</b>している<b>物</b>は<b>分</b>けられない","付従性（借金がなくなれば抵当権も消える）・随伴性（債権と一緒に移る）・物上代位性（保険金などに及ぶ）・不可分性（全部返すまで全体に及ぶ）"),"teitou"],
+    ["ken",/借地|地主/,G("借地権の期間の覚え方","<b>サンジュウ</b>（30）→<b>ニジュウ</b>（20）→<b>ジュウ</b>（10）。定期は<b>ゴジュウ</b>（50）以上","最初30年以上、1回目の更新20年以上、2回目以降10年以上。一般定期借地権は50年以上、事業用は10年以上50年未満（公正証書）"),"shakuchi"],
+    ["ken",/借家|大家|賃貸借|又貸し|転貸|敷金/,null,"shakuchi"],
+    ["ken",/共有/,G("共有の覚え方","<b>保存</b>はひとりで、<b>管理</b>は多数決、<b>変更</b>はみんなで",""),"kyoyu"],
+    ["hou",/開発/,G("開発許可の覚え方","<b>1円</b>の<b>梨</b>でも<b>酸</b>味は<b>十分</b>","市街化区域1,000㎡／調整区域は面積なし（すべて許可）／非線引き・準都市計画区域3,000㎡／区域外1万㎡（1ha）以上で許可が必要"),"kaihatsu"],
+    ["hou",/事後届出|国土利用計画法/,G("国土法の覚え方","<b>ニ・ゴ・イチマン</b>、届出は<b>2週間</b>","市街化区域2,000㎡／その他の都市計画区域5,000㎡／区域外10,000㎡以上。届けるのは買主、契約から2週間以内"),"kokudo"],
+    ["hou",/農地|田んぼ|畑/,G("農地法の覚え方","<b>3</b>条は<b>そのまま</b>、<b>4</b>条は<b>自分で転用</b>、<b>5</b>条は<b>転用して移す</b>","3条は農業委員会、4条・5条は知事等。市街化区域なら4条・5条は農業委員会への届出でOK"),"nouchi"],
+    ["hou",/防火地域/,G("防火・準防火の覚え方","防火は<b>3</b>階・<b>100</b>㎡、準防火は<b>4</b>階・<b>1,500</b>㎡","これをこえると耐火建築物等にする必要がある"),"boka"],
+    ["hou",/日影/,G("日影規制の覚え方","日かげは<b>商</b>・<b>工</b>・<b>工専</b>に当たらない","商業地域・工業地域・工業専用地域は日影規制の対象外"),null],
+    ["hou",/前の道路の幅/,G("前面道路の覚え方","住居は<b>ヨン</b>（4/10）、その他は<b>ロク</b>（6/10）",""),null],
+    ["hou",/盛土|切土/,G("盛土規制の覚え方","盛り<b>イチ</b>、切り<b>ニ</b>、合わせて<b>ニ</b>、広さ<b>ゴヒャク</b>","盛土で1m超の崖、切土で2m超の崖、盛土と切土で2m超の崖、崖がなくても盛土2m超、面積500㎡超で許可"),null],
+    ["hou",/建ぺい率|容積率|延べ面積/,G("建ぺい率・容積率の覚え方","建ぺい率は<b>ぺったんこ</b>（1階の広さ）、容積率は<b>体積</b>（全部の階の合計）",""),"kenpei"],
+    ["hou",/第一種低層|病院|診療所/,G("第一種低層住居専用地域の覚え方","<b>診療</b>帰りの<b>老人</b>は<b>寺</b>で<b>本</b>を読み、<b>病院</b>帰りの<b>大学</b>生は<b>店</b>で食事せず","診療所・老人ホーム・神社寺院・図書館はOK。病院・大学・（一般の）店舗や飲食店はNG"),"youto"],
+    ["hou",/用途地域/,null,"youto"],
+    ["zei",/不動産取得税/,G("不動産取得税の覚え方","「<b>ふどう</b>」さん → <b>府道</b>（都道府県の税）。税率は<b>ヨン</b>（4%）、土地・住宅は<b>サン</b>（3%）","免税点は土地10万円・家屋（建築）23万円・（その他）12万円。相続は非課税"),"zei"],
+    ["zei",/固定資産税/,G("固定資産税の覚え方","税率<b>イッテンヨン</b>（1.4%）、<b>1月1日</b>の持ち主、免税点は土地<b>サンジュウ</b>・家屋<b>ニジュウ</b>","住宅用地は200㎡まで1/6、こえた部分は1/3"),"menzei"],
+    ["zei",/免税点|課税標準が10万円/,null,"menzei"],
+    ["zei",/地価公示|標準地/,G("地価公示の覚え方","<b>公示</b>は<b>お正月</b>（1月1日）、<b>調査</b>は<b>七夕</b>のころ（7月1日）",""),"chika"],
+    ["zei",/鑑定|原価法|収益還元/,null,"kantei"],
+    ["zei",/徒歩/,G("徒歩時間の覚え方","<b>ハチマル</b>（80m）で1分、あまりは<b>切り上げ</b>",""),"toho"],
+    ["zei",/印紙/,G("印紙税の覚え方","はり忘れても契約は<b>有効</b>、でも罰は<b>3倍</b>","国・地方公共団体が作った文書は非課税。建物の賃貸借契約書は非課税、土地の賃貸借契約書は課税"),null],
+    ["zei",/新築/,G("「新築」の覚え方","<b>1年未満</b> ＋ <b>だれも住んでいない</b>、の両方",""),null]
+  ];
+  Q.forEach(q=>{
+    const t=q.q+" "+q.pt;
+    for(const [c,re,g,f] of R){
+      if(q.c!==c||!re.test(t))continue;
+      if(g&&!q.goro)q.goro=g;
+      if(f&&!q.fig)q.fig=f;
+      if(q.goro&&q.fig)break;
+    }
+  });
+  /* 個別の調整（自動で付けた組み合わせが合わないもの） */
+  const byId=id=>Q.find(q=>q.id===id);
+  const gName=t=>R.find(r=>r[2]&&r[2].t===t)[2];
+  const TAX=G("「だれの税」の覚え方","<b>国</b>は<b>登録</b>と<b>印紙</b>、「ふどう」さんは<b>府道</b>（都道府県）、<b>固定</b>は<b>市町村</b>","登録免許税・印紙税＝国税／不動産取得税＝都道府県税／固定資産税＝市町村税");
+  const OV={
+    "gyo-21":{g:null,f:null},"gyo-22":{g:null,f:null},"gyo-66":{g:null,f:null},"gyo-69":{g:null},
+    "gyo-42":{g:gName("35条・37条の覚え方"),f:"t3537"},
+    "hou-27":{g:gName("建ぺい率・容積率の覚え方")},
+    "zei-7":{g:TAX},"zei-41":{g:TAX},"zei-1":{g:TAX},"zei-4":{g:TAX},
+    "zei-43":{g:gName("固定資産税の覚え方"),f:"menzei"},
+    "zei-42":{f:"zei"},"zei-5":{f:null},"zei-13":{f:null},"zei-14":{f:null},"zei-15":{f:null}
+  };
+  for(const id in OV){const q=byId(id);if(!q)continue;const o=OV[id];
+    if("g" in o){if(o.g)q.goro=o.g;else delete q.goro}
+    if("f" in o){if(o.f)q.fig=o.f;else delete q.fig}}
+})();
 /* ---------- レベル ---------- */
 const LV={1:{name:"基礎",sub:"ことばとしくみ"},2:{name:"標準",sub:"よく出るルール"},3:{name:"合格レベル",sub:"本番でまちがえやすい所"}};
 const ORDER=["gyo","ken","hou","zei"];
@@ -1723,11 +1904,16 @@ Q.sort((a,b)=>ORDER.indexOf(a.c)-ORDER.indexOf(b.c)||a.lv-b.lv||num(a.id)-num(b.
 const KEY="takken-ox-v1";
 let store={res:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.res)store=s}catch(e){}
+if(!store.ses)store.ses={};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}};
+/* 途中の状態（どこまで解いたか）を、セットごとに保存する */
+function saveSes(){if(!S.key)return;store.ses[S.key]={list:S.list,i:S.i,picked:S.picked,results:S.results,label:S.label,from:S.from,ts:Date.now()};save()}
+function dropSes(key){if(key&&store.ses[key]){delete store.ses[key];save()}}
+const validSes=k=>{const v=store.ses[k];return v&&Array.isArray(v.list)&&v.list.length&&v.list.every(id=>Q.some(q=>q.id===id))&&v.i<v.list.length};
 
 /* ---------- 画面 ---------- */
 const app=document.getElementById("app");
-let S={view:"home",list:[],i:0,picked:null,results:[],label:"",from:null};
+let S={view:"home",list:[],i:0,picked:null,results:[],label:"",from:null,key:null};
 
 const header=()=>`<div class="top"><button class="brand" data-act="home" aria-label="ホームへ"><span class="seal">宅建</span><span><b>はじめての宅建○×</b><small>基礎から合格レベルまで</small></span></button>${S.view!=="home"?`<button class="ghost" data-act="home">ホーム</button>`:""}</div>`;
 
@@ -1747,6 +1933,10 @@ function home(){
       ${[1,2,3].map(l=>`<span class="lvsum">${LV[l].name} ${lvTot[l-1].ok}/${lvTot[l-1].n}</span>`).join("")}</div>
     <div class="meter" aria-hidden="true"><i style="width:${pct}%"></i></div>
   </section>
+  ${(()=>{const ks=Object.keys(store.ses).filter(validSes).sort((a,b)=>store.ses[b].ts-store.ses[a].ts);if(!ks.length)return"";
+    return `<section class="resume"><h2>続きから解く</h2>${ks.map(k=>{const v=store.ses[k];const pos=v.i+(v.picked!==null?1:0);return `
+      <div class="resitem" style="--fc:${keyColor(k)}"><span class="t">${keyName(k)}<small>${v.list.length}問中 ${pos}問 解答ずみ</small></span>
+      <button class="btn" data-act="resume" data-k="${k}">続きから</button><button class="ghost" data-act="drop" data-k="${k}" aria-label="${keyName(k)}の途中の記録を消す">やめる</button></div>`}).join("")}</section>`})()}
   <div class="steps" aria-label="おすすめの進め方">
     ${[1,2,3].map(l=>`<div class="step"><span class="lvdot l${l}">${l}</span><div><b>${LV[l].name}</b><small>${LV[l].sub}</small></div></div>`).join('<span class="arrow" aria-hidden="true">→</span>')}
   </div>
@@ -1757,7 +1947,7 @@ function home(){
       <div class="lvls">${[1,2,3].map(l=>{const ls=stat(setOf(k,l));const full=ls.ok===ls.n&&ls.n>0;return `
         <button class="lvbtn" data-act="lv" data-c="${k}" data-lv="${l}">
           <span class="lvdot l${l}">${l}</span><span class="nm">${LV[l].name}<small>${ls.n}問</small></span>
-          <span class="sc">${full?'<b class="done">クリア</b>':ls.done?`${ls.ok}/${ls.n}`:"まだ"}</span></button>`}).join("")}</div>
+          <span class="sc">${validSes(k+":"+l)?`<b class="done">続き ${store.ses[k+":"+l].i+1}問目</b>`:full?'<b class="done">クリア</b>':ls.done?`${ls.ok}/${ls.n}`:"まだ"}</span></button>`}).join("")}</div>
     </section>`}).join("")}</div>
   <div class="row">
     <button class="btn" data-act="mock">本番の配分で50問</button>
@@ -1778,7 +1968,16 @@ function home(){
 }
 
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function start(ids,label,from){S={view:"quiz",list:ids,i:0,picked:null,results:[],label,from:from||null};render();window.scrollTo(0,0)}
+function start(ids,label,from,key){S={view:"quiz",list:ids,i:0,picked:null,results:[],label,from:from||null,key:key||null};saveSes();render();window.scrollTo(0,0)}
+/* 保存があれば続きから、なければ最初から */
+function resumeOr(key,make,label,from){
+  if(validSes(key)){const v=store.ses[key];S={view:"quiz",list:v.list,i:v.i,picked:v.picked,results:v.results||[],label:v.label,from:v.from||null,key};render();window.scrollTo(0,0)}
+  else start(make(),label,from,key);
+}
+function restart(){const k=S.key;dropSes(k);const make=MAKERS[k]?MAKERS[k]:()=>S.list;const lbl=S.label,fr=S.from;start(make(),lbl,fr,k)}
+const MAKERS={mock:()=>mock(),all:()=>shuffle(Q.map(q=>q.id)),wrong:()=>wrongIds()};
+const keyName=k=>{if(k==="mock")return"本番の配分で50問";if(k==="all")return"全問シャッフル";if(k==="wrong")return"まちがえた問題";const [c,l]=k.split(":");return FIELDS[c]&&LV[l]?FIELDS[c].name+"・"+LV[l].name:k};
+const keyColor=k=>{const c=k.split(":")[0];return FIELDS[c]?FIELDS[c].color:"var(--acc)"};
 function mock(){let ids=[];ORDER.forEach(k=>{ids=ids.concat(shuffle(setOf(k).map(q=>q.id)).slice(0,FIELDS[k].exam))});return shuffle(ids)}
 
 function quiz(){
@@ -1786,6 +1985,7 @@ function quiz(){
   const ok=answered&&(S.picked===q.a);
   let out=header()+`<div class="qhead" style="--fc:${f.color}"><span class="fl">${f.name}</span><span class="chip l${q.lv}">${LV[q.lv].name}</span><span class="n">${S.i+1} / ${S.list.length}</span></div>
   <div class="meter" aria-hidden="true"><i style="width:${(S.i+(answered?1:0))/S.list.length*100}%;background:${f.color}"></i></div>
+  ${S.key&&(S.i>0||answered)?`<div class="qtools"><button class="ghost" data-act="restart">このセットを最初からやり直す</button></div>`:""}
   <article class="qcard" style="--fc:${f.color}">
     <div class="qno">${S.label}　○か×か？</div>
     <div class="qtext">${q.q}</div>
@@ -1800,6 +2000,7 @@ function quiz(){
       <div><h4>かんたん解説</h4><div class="body">${q.exp}</div></div>
       ${fig?`<figure class="fig" style="margin:0">${fig.html()}<figcaption class="cap">${fig.cap}</figcaption></figure>`:""}
       <div class="point">${q.pt}</div>
+      ${q.goro?`<div class="goro"><span class="lbl">${q.goro.t}</span><span class="g">${q.goro.g}</span>${q.goro.n?`<br><small>${q.goro.n}</small>`:""}</div>`:""}
       <div class="hon"><span class="lbl">本番の試験では、こんな書き方で出ます</span>「${q.hon.replace(/（→ 誤り）$/,"")}」<br><b>→ ${/（→ 誤り）$/.test(q.hon)?"誤り":"正しい"}</b></div>
       ${q.w?`<div><h4>ことばメモ</h4><dl class="words">${q.w.map(w=>`<div><dt><ruby>${w[0]}<rt>${w[1]}</rt></ruby></dt><dd>${w[2]}</dd></div>`).join("")}</dl></div>`:""}
     </div>
@@ -1830,25 +2031,28 @@ function pick(v){
   if(S.picked!==null)return;
   const q=Q.find(x=>x.id===S.list[S.i]);S.picked=v;
   const ok=v===q.a;const r=store.res[q.id]||{n:0};
-  store.res[q.id]={ok,n:r.n+1};save();S.results.push({id:q.id,ok});
+  store.res[q.id]={ok,n:r.n+1};S.results.push({id:q.id,ok});saveSes();save();
   render();
   const v2=document.querySelector(".verdict");if(v2)v2.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
 }
-function next(){if(S.i+1<S.list.length){S.i++;S.picked=null;render();window.scrollTo(0,0)}else{S.view="end";render();window.scrollTo(0,0)}}
+function next(){if(S.i+1<S.list.length){S.i++;S.picked=null;saveSes();render();window.scrollTo(0,0)}else{dropSes(S.key);S.view="end";render();window.scrollTo(0,0)}}
 
 app.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
   if(a==="home"){S.view="home";render();window.scrollTo(0,0)}
-  else if(a==="lv"){const c=b.dataset.c,l=+b.dataset.lv;start(setOf(c,l).map(q=>q.id),FIELDS[c].name+"・"+LV[l].name,{c,lv:l})}
-  else if(a==="mock"){start(mock(),"本番の配分で50問")}
-  else if(a==="all"){start(shuffle(Q.map(q=>q.id)),"全問シャッフル")}
-  else if(a==="wrong"){const w=wrongIds();if(w.length)start(w,"まちがえた問題")}
+  else if(a==="lv"){const c=b.dataset.c,l=+b.dataset.lv;resumeOr(c+":"+l,()=>setOf(c,l).map(q=>q.id),FIELDS[c].name+"・"+LV[l].name,{c,lv:l})}
+  else if(a==="mock"){resumeOr("mock",mock,"本番の配分で50問")}
+  else if(a==="all"){resumeOr("all",()=>shuffle(Q.map(q=>q.id)),"全問シャッフル")}
+  else if(a==="wrong"){if(validSes("wrong")||wrongIds().length)resumeOr("wrong",wrongIds,"まちがえた問題")}
+  else if(a==="resume"){const k=b.dataset.k,v=store.ses[k];if(v)resumeOr(k,()=>v.list,v.label,v.from)}
+  else if(a==="drop"){dropSes(b.dataset.k);render()}
+  else if(a==="restart"){restart()}
   else if(a==="retry"){start(S.results.filter(r=>!r.ok).map(r=>r.id),"やり直し")}
   else if(a==="one"){start([b.dataset.id],"1問だけ")}
   else if(a==="pick"){pick(b.dataset.v==="1")}
   else if(a==="next"){next()}
   else if(a==="reset"){
-    if(b.dataset.sure){store={res:{}};save();render()}
+    if(b.dataset.sure){store={res:{},ses:{}};save();render()}
     else{b.dataset.sure="1";b.textContent="本当に消す？（もう一度押す）"}
   }
 });
@@ -1867,8 +2071,8 @@ render();
   function ok(){el.innerHTML="オフライン利用：<b>準備OK</b>（電波がなくても使えます）"}
   if(!("serviceWorker" in navigator)){el.textContent="オフライン利用：この環境では使えません";return}
   navigator.serviceWorker.register("sw.js").then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v2").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v2").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v3").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v3").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
