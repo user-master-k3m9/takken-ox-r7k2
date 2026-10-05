@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>はじめての宅建○×</title>
+<meta name="description" content="宅建士試験を超基礎から学べる○×一問一答">
+<meta name="theme-color" content="#2c5d8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="宅建○×">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=BIZ+UDPGothic:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+.offline{max-width:680px;margin-inline:auto;font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
+.offline b{color:var(--c2)}
+</style>
+<style>
+/* Layout: 間取り図の方眼紙の上に、1枚ずつめくる問題カード。採点は赤ペンの○ */
+:root{
+  --paper:#f4f6f3; --grid:rgba(44,93,138,.07); --card:#ffffff; --ink:#1d2a33; --muted:#5d6a72; --line:#d6ddd8;
+  --acc:#2c5d8a; --acc-soft:#e4edf6; --maru:#cf3b2a; --maru-soft:#fbe7e3; --batsu:#46566a; --batsu-soft:#e8ecf1;
+  --hl:#fff0a8; --hl-ink:#1d2a33; --hl-fill:#fff7d1;
+  --c1:#2c5d8a; --c2:#3c7a4e; --c3:#a5661a; --c4:#7a4f8f;
+  --display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  --body:"BIZ UDPGothic","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#12181c; --grid:rgba(127,176,220,.06); --card:#1b2328; --ink:#e5ebee; --muted:#9ba8b0; --line:#2f3a41;
+  --acc:#82b2df; --acc-soft:#1e3245; --maru:#ff7b67; --maru-soft:#3a201c; --batsu:#a9b8cc; --batsu-soft:#253039;
+  --hl:#5c4e10; --hl-ink:#fff6cf; --hl-fill:#332c12;
+  --c1:#82b2df; --c2:#8cc79a; --c3:#e3a75c; --c4:#c59ed8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12181c; --grid:rgba(127,176,220,.06); --card:#1b2328; --ink:#e5ebee; --muted:#9ba8b0; --line:#2f3a41;
+  --acc:#82b2df; --acc-soft:#1e3245; --maru:#ff7b67; --maru-soft:#3a201c; --batsu:#a9b8cc; --batsu-soft:#253039;
+  --hl:#5c4e10; --hl-ink:#fff6cf; --hl-fill:#332c12;
+  --c1:#82b2df; --c2:#8cc79a; --c3:#e3a75c; --c4:#c59ed8; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;
+  color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.8;
+  padding-inline:16px; padding-block:12px 48px;
+}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.35}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+mark{background:linear-gradient(transparent 45%,var(--hl) 45%);color:inherit;padding:0 2px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:4px}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left}
+.brand .seal{width:40px;height:40px;border-radius:50%;border:3px solid var(--maru);color:var(--maru);display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:13px;line-height:1;transform:rotate(-8deg);flex:none}
+.brand b{font-family:var(--display);font-size:20px;font-weight:900;letter-spacing:.02em}
+.brand small{display:block;font-size:11px;color:var(--muted);letter-spacing:.08em}
+.ghost{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px}
+
+/* home */
+.hero{display:flex;flex-direction:column;gap:10px;padding-block:8px}
+.hero h1{font-size:clamp(26px,6vw,34px);font-weight:900}
+.hero h1 .ox{color:var(--maru)}
+.hero p{margin:0;color:var(--muted);max-width:34em}
+.total{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:baseline;font-size:14px;color:var(--muted)}
+.total strong{font-family:var(--display);font-size:28px;color:var(--ink);font-variant-numeric:tabular-nums}
+.meter{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--maru);border-radius:99px;transition:width .4s}
+
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:520px){.fields{grid-template-columns:1fr}}
+.field{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;text-align:left;border-top:5px solid var(--fc)}
+.field:hover{border-color:var(--fc)}
+.field .tag{font-size:12px;letter-spacing:.08em;color:var(--fc);font-weight:700}
+.field h3{font-size:19px}
+.field p{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
+.field .stat{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.field .meter i{background:var(--fc)}
+.field .go{margin-top:2px;font-family:var(--display);font-weight:700;color:var(--fc);font-size:15px}
+
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-family:var(--display);font-weight:700;font-size:16px;background:var(--acc);color:var(--card)}
+.btn.sub{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn[disabled]{opacity:.45;cursor:default}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.panel summary{font-family:var(--display);font-weight:700;font-size:17px;cursor:pointer}
+.panel[open] summary{margin-bottom:10px}
+.panel p{margin:.4em 0}
+.stack{display:flex;height:34px;border-radius:8px;overflow:hidden;margin:10px 0 6px}
+.stack span{display:grid;place-items:center;color:var(--card);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden}
+.legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px;font-size:13px}
+.legend div{display:flex;gap:6px;align-items:center}
+.legend i{width:12px;height:12px;border-radius:3px;flex:none}
+.legend b{margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* quiz */
+.qhead{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted)}
+.qhead .fl{color:var(--fc);font-weight:700}
+.qhead .n{margin-left:auto;font-variant-numeric:tabular-nums}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:18px;position:relative}
+.qno{font-family:var(--display);font-size:13px;color:var(--fc);letter-spacing:.1em;font-weight:700}
+.qtext{font-size:clamp(18px,4.6vw,21px);line-height:1.75;font-weight:700;font-family:var(--body)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{border:2px solid var(--line);background:var(--paper);border-radius:16px;padding:14px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .08s}
+.choice:active{transform:scale(.97)}
+.choice .mk{font-family:var(--display);font-size:46px;font-weight:900;line-height:1}
+.choice .lb{font-size:13px;color:var(--muted)}
+.choice.o .mk{color:var(--maru)}
+.choice.x .mk{color:var(--batsu)}
+.choice:hover{border-color:var(--acc)}
+.choice.picked{border-color:var(--ink)}
+.choice[disabled]{cursor:default}
+.choice.dim{opacity:.4}
+
+.verdict{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px}
+.verdict.ok{background:var(--maru-soft)}
+.verdict.ng{background:var(--batsu-soft)}
+.verdict .big{font-family:var(--display);font-weight:900;font-size:52px;line-height:1;flex:none;width:58px;text-align:center}
+.verdict.ok .big{color:var(--maru)}
+.verdict.ng .big{color:var(--batsu)}
+.verdict h3{font-size:20px}
+.verdict p{margin:0;font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.verdict .big{animation:stamp .35s ease-out}}
+@keyframes stamp{from{transform:scale(1.8) rotate(-15deg);opacity:0}to{transform:none;opacity:1}}
+
+.exp{display:flex;flex-direction:column;gap:14px}
+.exp h4{font-family:var(--display);font-size:15px;margin:0;color:var(--acc);letter-spacing:.04em}
+.exp .body p{margin:0 0 .6em}
+.point{border:2px dashed var(--maru);border-radius:12px;padding:10px 14px;font-weight:700;display:flex;gap:10px;align-items:flex-start}
+.point::before{content:"覚える";flex:none;font-size:11px;background:var(--maru);color:var(--card);border-radius:6px;padding:2px 6px;margin-top:4px;letter-spacing:.06em}
+.hon{background:var(--paper);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.75}
+.hon .lbl{display:block;font-size:12px;color:var(--muted);letter-spacing:.06em;margin-bottom:2px}
+.words{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.words div{display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+.words dt{font-weight:700;margin:0}
+.words dt rt{font-size:10px;color:var(--muted);font-weight:400}
+.words dd{margin:0;color:var(--muted)}
+.fig{border:1px solid var(--line);border-radius:12px;padding:14px 10px;background:var(--paper);overflow-x:auto}
+.fig .cap{font-size:12px;color:var(--muted);text-align:center;margin-top:6px}
+.qnav{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.qnav .btn{flex:1 1 auto}
+.kbd{font-size:12px;color:var(--muted);text-align:center}
+
+/* figures */
+.fig-svg{width:100%;max-width:520px;height:auto;display:block;margin:0 auto}
+.fig-svg text{fill:var(--ink);font-size:13px;font-family:var(--body)}
+.fig-svg text.sm{font-size:11px;fill:var(--muted)}
+.fig-svg text.b{font-weight:700}
+.fig-svg text.red{fill:var(--maru);font-weight:700}
+.fig-svg text.acc{fill:var(--acc);font-weight:700}
+.fig-svg .bx{fill:var(--card);stroke:var(--ink);stroke-width:1.4}
+.fig-svg .ax{fill:var(--acc-soft);stroke:var(--acc);stroke-width:1.4}
+.fig-svg .hx{fill:var(--hl-fill);stroke:var(--maru);stroke-width:1.6}
+.fig-svg .gx{fill:var(--line);stroke:none}
+.fig-svg .ln{stroke:var(--ink);stroke-width:1.4;fill:none}
+.fig-svg .ln.d{stroke-dasharray:5 4}
+.fig-svg .ln.red{stroke:var(--maru);stroke-width:2}
+.fig-svg .ln.thick{stroke-width:5}
+.fig-svg .ah{fill:var(--ink)}
+.fig-svg .ah.red{fill:var(--maru)}
+.fig-svg .dot{fill:var(--maru)}
+.fig-svg .tree{fill:var(--c2)}
+.ft{width:100%;border-collapse:collapse;font-size:14px;min-width:300px;background:var(--card)}
+.ft th,.ft td{border:1px solid var(--line);padding:7px 8px;text-align:center;vertical-align:middle;line-height:1.5}
+.ft th{background:var(--acc-soft);font-weight:700}
+.ft td.l,.ft th.l{text-align:left}
+.ft .y{color:var(--maru);font-weight:700;font-size:17px}
+.ft .n{color:var(--batsu);font-weight:700;font-size:17px}
+.ft .hit{background:var(--hl-fill)}
+
+/* end */
+.end{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.score{font-family:var(--display);font-weight:900;font-size:56px;line-height:1;color:var(--maru);font-variant-numeric:tabular-nums}
+.score small{font-size:22px;color:var(--muted)}
+.miss{display:flex;flex-direction:column;gap:8px;width:100%}
+.miss button{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.6}
+.miss button b{color:var(--batsu);margin-right:6px}
+.foot{font-size:12px;color:var(--muted);line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+
+<script>
+const FIELDS={
+  gyo:{name:"宅建業法",tag:"いちばん点がとれる",desc:"不動産屋さん（宅建業者）が守るお仕事のルール。",color:"var(--c1)",exam:20},
+  ken:{name:"権利関係",tag:"民法など",desc:"売る・貸す・借りる・相続する…人と人との約束のルール。",color:"var(--c2)",exam:14},
+  hou:{name:"法令上の制限",tag:"まちづくり",desc:"そこに建ててもいい？どれくらいの大きさ？を決めるルール。",color:"var(--c3)",exam:8},
+  zei:{name:"税・その他",tag:"税金・広告など",desc:"家や土地にかかる税金、広告の決まり、土地の性質など。",color:"var(--c4)",exam:8}
+};
+
+/* ---------- 図のための小さな道具 ---------- */
+const svg=(w,h,label,body)=>`<svg class="fig-svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${body}</svg>`;
+const T=(x,y,s,c="",a="middle")=>`<text x="${x}" y="${y}" text-anchor="${a}" class="${c}">${s}</text>`;
+const R=(x,y,w,h,c="bx",r=8)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" class="${c}"/>`;
+const L=(x1,y1,x2,y2,c="ln")=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${c}"/>`;
+function Ar(x1,y1,x2,y2,c=""){
+  const a=Math.atan2(y2-y1,x2-x1),h=9,w=5;
+  const bx=x2-h*Math.cos(a),by=y2-h*Math.sin(a);
+  const p1=[bx+w*Math.sin(a),by-w*Math.cos(a)],p2=[bx-w*Math.sin(a),by+w*Math.cos(a)];
+  return L(x1,y1,bx,by,"ln "+c)+`<polygon points="${x2},${y2} ${p1[0].toFixed(1)},${p1[1].toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}" class="ah ${c}"/>`;
+}
+const house=(x,y,c="ax")=>`<polygon points="${x},${y+11} ${x+14},${y} ${x+28},${y+11}" class="${c}"/><rect x="${x+4}" y="${y+11}" width="20" height="15" class="${c}"/>`;
+const person=(x,y,name,sub,c="bx")=>`<circle cx="${x}" cy="${y}" r="21" class="${c}"/>${T(x,y+5,name,"b")}${sub?T(x,y+38,sub,"sm"):""}`;
+const tree=(x,y)=>`<rect x="${x-1.5}" y="${y}" width="3" height="10" class="gx"/><circle cx="${x}" cy="${y-2}" r="7" class="tree"/>`;
+const tbl=(head,rows)=>`<table class="ft"><thead><tr>${head.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>i===0?`<th class="l">${c}</th>`:`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+const Y='<span class="y">○</span>',N='<span class="n">×</span>';
+
+const FIGS={
+  gyoTable:{cap:"○の組み合わせを「くり返し・商売として」するなら免許が必要",html:()=>tbl(["","売買<br><small>売る・買う</small>","交換<br><small>とりかえる</small>","貸借<br><small>貸す・借りる</small>"],[
+    ["自ら<br><small>自分が当事者</small>",Y,Y,`<span class="n">×</span><br><small>大家さんはOK</small>`],
+    ["代理<br><small>かわりに契約</small>",Y,Y,Y],
+    ["媒介<br><small>なかだち</small>",Y,Y,Y]])},
+  menkyo:{cap:"事務所の「数」ではなく、いくつの都道府県にまたがるかで決まる",html:()=>svg(340,170,"知事免許と大臣免許",
+    T(80,18,"1つの都道府県だけ","b")+T(255,18,"2つ以上の都道府県","b")+
+    R(10,28,140,80)+T(22,46,"東京都","sm","start")+house(30,62)+house(62,62)+house(94,62)+
+    R(180,28,70,80)+T(190,46,"東京都","sm","start")+house(200,62)+
+    R(258,28,72,80)+T(266,46,"神奈川県","sm","start")+house(280,62)+
+    Ar(80,112,80,134)+Ar(255,112,255,134)+
+    T(80,155,"都道府県知事の免許","acc")+T(255,155,"国土交通大臣の免許","red"))},
+  tl:{cap:"「説明」は契約の前、「書面（契約書）」は契約の後",html:()=>svg(340,160,"重要事項説明と37条書面の順番",
+    Ar(12,72,330,72)+T(330,92,"時間","sm","end")+
+    R(14,14,116,42,"ax")+T(72,32,"重要事項の説明","b")+T(72,49,"35条・宅建士が説明","sm")+L(72,56,72,72,"ln d")+
+    `<circle cx="170" cy="72" r="9" class="dot"/>`+T(170,44,"契約","red")+
+    R(212,14,118,42,"ax")+T(271,32,"37条書面を交付","b")+T(271,49,"売主・買主の両方へ","sm")+L(271,56,271,72,"ln d")+
+    T(90,96,"契約の前に","sm")+T(250,96,"契約したら遅れずに","sm")+
+    T(170,128,"説明する相手：買う人・借りる人（売る人には不要）","sm")+
+    T(170,148,"説明するときは宅建士証を必ず見せる","sm"))},
+  cooling:{cap:"告げられた日を「1日目」と数えて8日間",html:()=>{
+    let b="";for(let i=0;i<9;i++){const x=10+i*36;b+=R(x,40,32,32,i<8?"ax":"bx",6)+T(x+16,61,i+1,"b");}
+    b+=T(10+8*36+16,63,"×","red");
+    return svg(340,150,"クーリング・オフの8日間",
+      T(26,28,"↓ 書面で告げられた日","sm","start")+b+
+      L(10,86,294,86,"ln red")+L(10,80,10,92,"ln red")+L(294,80,294,92,"ln red")+
+      T(152,108,"この8日間に「やめます」の書面を出せばOK","red")+
+      T(170,136,"書面を出した時点で効き目が出る（届くのが9日目でもOK）","sm"))}},
+  tetsuke:{cap:"売主が宅建業者・買主がふつうの人のときのルール",html:()=>svg(340,120,"手付金は代金の2割まで",
+    T(170,26,"代金 3,000万円","b")+R(20,36,300,30,"bx",6)+R(20,36,60,30,"hx",6)+T(50,56,"20%","red")+
+    T(200,56,"残り 80%","sm")+
+    T(20,92,"手付金は 600万円 まで","red","start")+
+    T(20,112,"※損害賠償の予定＋違約金も「合わせて」20%まで","sm","start"))},
+  hoshu:{cap:"金額を3つの部分に分けて計算。400万円をこえるなら「3%＋6万円」の早わざ",html:()=>svg(340,175,"売買の仲介手数料の上限",
+    T(10,30,"200万円までの部分","","start")+R(150,16,100,20,"ax",4)+T(258,31,"5%","b","start")+
+    T(10,62,"200〜400万円の部分","","start")+R(150,48,80,20,"ax",4)+T(238,63,"4%","b","start")+
+    T(10,94,"400万円をこえる部分","","start")+R(150,80,60,20,"ax",4)+T(218,95,"3%","b","start")+
+    R(10,112,320,52,"hx")+T(170,134,"1,000万円 × 3% ＋ 6万円 ＝ 36万円","red")+
+    T(170,154,"これに消費税。売主・買主それぞれから受け取れる上限","sm"))},
+  hosho:{cap:"お客さんに損をさせたときのための「預けるお金」",html:()=>tbl(["","営業保証金<br><small>自分で供託所に預ける</small>","保証協会に入る<br><small>弁済業務保証金分担金</small>"],[
+    ["本店（主たる事務所）","1,000万円","60万円"],["支店1か所ごと","500万円","30万円"]])},
+  sagi:{cap:"だまされた人より、おどされた人のほうが強く守られる",html:()=>svg(340,190,"詐欺と強迫と第三者",
+    person(55,48,"A","売った人")+person(170,48,"B","だました人")+person(285,48,"C","次に買った人")+
+    Ar(78,48,146,48)+T(112,40,"売る","sm")+Ar(193,48,261,48)+T(227,40,"転売","sm")+
+    R(10,106,320,34,"bx")+T(20,128,"詐欺：Cが事情を知らず落ち度もない → Aの負け","","start")+
+    R(10,148,320,34,"hx")+T(20,170,"強迫：Cがどんな人でも → Aは取り消せる","red","start"))},
+  nijuu:{cap:"不動産は「登記」をした人が、他の人に「自分のもの」と言える",html:()=>svg(340,185,"二重譲渡",
+    person(170,32,"A","売った人")+person(70,118,"B","")+person(270,118,"C","")+
+    Ar(152,46,88,102)+T(82,72,"① 先に約束","sm","end")+
+    Ar(188,46,252,102)+T(258,72,"② あとで約束","sm","start")+
+    T(70,158,"登記なし","sm")+R(232,146,76,22,"hx",11)+T(270,162,"登記 ✓","red")+
+    T(170,182,"先に登記した C の勝ち","red"))},
+  dairi:{cap:"代理人がした契約の結果は、本人に直接届く",html:()=>svg(340,175,"代理のしくみ",
+    person(60,34,"本人","")+person(60,138,"代理人","")+person(280,138,"相手方","")+
+    Ar(60,57,60,115)+T(72,92,"代理権をあげる","sm","start")+
+    L(83,138,257,138)+T(170,130,"契約する","sm")+
+    Ar(260,124,82,42,"red")+T(196,72,"契約の効果は本人へ","red"))},
+  teitou:{cap:"抵当権は「もしもの時の予約」。ふだんは今までどおり住める",html:()=>svg(340,180,"抵当権のしくみ",
+    R(14,14,92,40,"ax")+T(60,39,"銀行","b")+person(60,128,"A","借りた人")+
+    Ar(60,56,60,104)+T(70,84,"お金を貸す","sm","start")+
+    house(228,102,"bx")+`<rect x="215" y="140" width="54" height="2" class="gx"/>`+T(242,156,"Aの家","sm")+
+    Ar(84,128,222,122)+T(150,118,"住み続けられる","sm")+
+    L(106,34,240,98,"ln d red")+R(186,52,64,22,"hx",11)+T(218,68,"抵当権","red")+
+    T(170,178,"返せなくなったら → 家を競売にかけてお金を回収","sm"))},
+  shakuchi:{cap:"借りている人は、法律で特に守られている",html:()=>tbl(["","借地<br><small>土地を借りる</small>","借家<br><small>建物を借りる</small>"],[
+    ["使いみち","建物を建てるため","住む・お店にする"],
+    ["期間","30年以上<br><small>短く決めても30年に</small>","1年未満で決めたら<br><small>「期間の定めなし」扱い</small>"],
+    ["新しい持ち主に<br>「借りてます」と<br>言える条件",`<span class="hit">土地の上の自分の<br>建物を登記</span>`,`<span class="hit">引渡し<br><small>（カギをもらって住んでいる）</small></span>`]])},
+  souzoku:{cap:"だれが一緒に相続するかで、配偶者の取り分が変わる",html:()=>svg(340,150,"配偶者と子2人の相続分",
+    person(80,34,"妻","配偶者","ax")+R(180,14,110,40)+T(235,39,"亡くなった人","b")+
+    L(101,30,180,30)+L(101,38,180,38)+
+    L(235,54,235,80)+L(140,80,300,80)+L(140,80,140,96)+L(300,80,300,96)+
+    person(140,116,"子","","ax")+person(300,116,"子","","ax")+
+    T(80,90,"1/2","red")+T(140,150,"1/4","red")+T(300,150,"1/4","red")+T(220,116,"子どもは1/2を人数で分ける","sm"))+
+    tbl(["相続人の組み合わせ","配偶者","もう一方"],[["配偶者＋子","1/2","1/2"],["配偶者＋親（直系尊属）","2/3","1/3"],["配偶者＋兄弟姉妹","3/4","1/4"]])},
+  toshi:{cap:"都市計画区域の中を「街をつくる所」と「街をおさえる所」に線引きする",html:()=>{
+    let t="";[[160,96],[180,120],[202,92],[220,124],[172,148],[214,152],[192,138]].forEach(p=>t+=tree(p[0],p[1]));
+    let bld=R(40,104,16,46,"ax",2)+R(60,90,18,60,"ax",2)+R(82,112,16,38,"ax",2)+R(102,98,20,52,"ax",2)+R(126,116,12,34,"ax",2);
+    return svg(340,200,"都市計画区域の線引き",
+      R(4,4,332,192,"bx",12)+T(326,22,"日本全体","sm","end")+
+      R(18,30,236,156,"bx",14)+T(30,50,"都市計画区域","b","start")+
+      R(28,60,116,116,"hx",10)+T(86,80,"市街化区域","red")+T(86,98,"街をつくる","sm")+bld+
+      R(150,60,94,116,"ax",10)+T(197,80,"市街化調整区域","b")+t+
+      T(197,176,"街をおさえる","sm")+
+      T(296,110,"都市計画","sm")+T(296,126,"区域外","sm"))}},
+  kenpei:{cap:"建ぺい率は「1階の広さ」、容積率は「全部の階の合計」",html:()=>{
+    let f="";for(let i=0;i<4;i++){const y=148-(i+1)*24;f+=R(212,y,84,24,"ax",0)+T(254,y+17,"50㎡","sm");}
+    return svg(340,200,"建ぺい率と容積率",
+      T(80,16,"上から見る","sm")+T(254,16,"横から見る","sm")+
+      R(20,26,120,120,"bx",2)+R(32,40,96,90,"hx",2)+T(80,82,"建築面積","red")+T(80,100,"60㎡","red")+
+      T(80,166,"敷地100㎡ → 建ぺい率 60%","b")+
+      L(180,148,330,148)+f+L(304,52,304,148,"ln red")+L(300,52,308,52,"ln red")+L(300,148,308,148,"ln red")+
+      T(312,96,"合計","sm","start")+T(312,112,"200㎡","red","start")+
+      T(254,166,"延べ面積 → 容積率 200%","b")+
+      T(170,192,"どちらも「敷地の広さ」と比べた割合","sm"))}},
+  setsudo:{cap:"火事や救急のとき、車が入れるように",html:()=>svg(340,175,"接道義務",
+    `<path d="M120 14 H300 V82 H150 V112 H120 Z" class="bx"/>`+T(210,52,"敷地","b")+
+    R(8,112,324,44,"gx",0)+T(70,140,"道路（幅4m以上）","b")+
+    L(120,112,150,112,"ln red thick")+
+    Ar(170,98,154,110,"red")+T(174,98,"2m以上 接する","red","start")+
+    L(318,114,318,154,"ln")+L(312,114,324,114)+L(312,154,324,154)+T(310,140,"4m","sm","end"))},
+  kaihatsu:{cap:"この広さ「以上」の開発をするとき、知事などの許可がいる（原則）",html:()=>tbl(["場所","許可がいる広さ"],[
+    ["市街化区域","1,000㎡以上"],[`<span class="hit">市街化調整区域</span>`,`<span class="hit">広さに関係なく</span>`],["非線引き都市計画区域","3,000㎡以上"],["都市計画区域の外","1ha（10,000㎡）以上"]])},
+  nouchi:{cap:"農地法は「何をするか」で3つに分かれる",html:()=>tbl(["","すること","だれの許可？","市街化区域なら"],[
+    ["3条","農地を農地のまま売る・貸す","農業委員会","許可が必要"],
+    ["4条","自分の農地を宅地などにかえる","都道府県知事など",`<span class="hit">農業委員会に届出</span>`],
+    ["5条","宅地などにかえるために売る・貸す","都道府県知事など",`<span class="hit">農業委員会に届出</span>`]])},
+  kokudo:{cap:"大きな土地の取引を国や県が見守るためのルール",html:()=>tbl(["場所","この広さ以上で届出"],[
+    ["市街化区域","2,000㎡"],["それ以外の都市計画区域","5,000㎡"],["都市計画区域の外","10,000㎡"]])+
+    `<p style="margin:10px 4px 0;font-size:14px"><b>だれが：</b>買った人（権利を取得した人）<br><b>いつまで：</b>契約した日から<mark>2週間以内</mark><br><b>どこへ：</b>市町村長を通して都道府県知事へ</p>`},
+  toho:{cap:"80mで1分。あまりが出たら1分に切り上げ",html:()=>{
+    let t="";for(let i=0;i<=6;i++){const x=20+i*48;t+=L(x,40,x,58);if(i<6)t+=T(x+24,36,(i+1)+"分","sm");}
+    return svg(340,125,"徒歩所要時間の計算",
+      R(20,44,288,10,"ax",2)+R(308,44,12,10,"hx",2)+t+L(320,40,320,58,"ln red")+T(314,36,"7分","red")+
+      T(20,76,"駅","b","start")+T(320,76,"物件","b","end")+T(170,76,"500m","sm")+
+      T(170,104,"500m ÷ 80m ＝ 6.25 → 切り上げて 7分","red"))}},
+  zei:{cap:"「国の税」か「地方の税」かがよく出る",html:()=>tbl(["税金","いつかかる？","だれの税？"],[
+    ["不動産取得税","土地・家を手に入れたとき","都道府県"],["固定資産税","持っている間、毎年","市町村"],
+    ["登録免許税","登記をするとき","国"],["印紙税","契約書などを作ったとき","国"]])}
+};
+
+/* ---------- 問題 ---------- */
+const Q=[
+/* 宅建業法 */
+{c:"gyo",q:"自分が持っているアパートを、自分で大家さんになって何人もの人に貸すには、宅建業の免許が必要である。",a:false,fig:"gyoTable",
+ exp:`<p>宅建業（たっけんぎょう）は、土地や建物の取引を<b>商売としてくり返す</b>お仕事のことです。</p><p>でも、<mark>自分の物件を自分で貸す（大家さんになる）ことは、宅建業に入りません</mark>。だから免許はいりません。</p><p>下の表で「自ら × 貸借」だけが×になっているところを見てください。ここが試験でいちばんねらわれます。</p>`,
+ pt:"「自分で貸す（自ら貸借）」は宅建業ではない → 免許はいらない",
+ hon:"Aが、自ら所有するアパートを不特定多数の者に反復継続して賃貸する場合、Aは免許を受ける必要がある。",
+ w:[["宅建業","たっけんぎょう","宅地建物取引業の略。土地・建物の売買などを商売として行うこと"]]},
+{c:"gyo",q:"他人の土地を「売りたい人」と「買いたい人」をつなぐ（なかだちする）ことを何度もくり返して商売にするには、宅建業の免許が必要である。",a:true,fig:"gyoTable",
+ exp:`<p>売りたい人と買いたい人を引き合わせることを<b>媒介（ばいかい）</b>といいます。いわゆる「仲介（ちゅうかい）」です。</p><p>町の不動産屋さんのお仕事のほとんどはこれ。<mark>媒介をくり返して商売にするなら、免許が必要</mark>です。</p><p>表を見ると、「代理」と「媒介」の行は売買・交換・貸借ぜんぶ○。つまり<b>人の取引を手伝う場合は、貸し借りでも免許が必要</b>です。</p>`,
+ pt:"他人の取引を手伝う（代理・媒介）なら、売買も貸し借りも免許が必要",
+ hon:"Aが、宅地の売買の媒介を不特定多数の者に反復継続して行う場合、Aは免許を受けなければならない。",
+ w:[["媒介","ばいかい","なかだち。売主と買主などを引き合わせて契約をまとめること"],["代理","だいり","本人のかわりに契約をすること"]]},
+{c:"gyo",q:"東京都と神奈川県に事務所（お店）がある会社は、国土交通大臣の免許を受ける。",a:true,fig:"menkyo",
+ exp:`<p>免許をくれる人は2種類あります。</p><p>・事務所が<b>1つの都道府県の中だけ</b> → その<b>都道府県知事</b><br>・事務所が<b>2つ以上の都道府県</b>にある → <b>国土交通大臣</b></p><p>東京都と神奈川県の2つにまたがっているので、<mark>国土交通大臣の免許</mark>です。</p><p>ちなみに、東京都の中に事務所が10個あっても、1つの都道府県の中だけなので「東京都知事」の免許です。数ではなく、いくつの都道府県にまたがるかで決まります。</p>`,
+ pt:"1つの都道府県だけ → 知事／2つ以上 → 国土交通大臣",
+ hon:"東京都と神奈川県に事務所を設置して宅地建物取引業を営もうとする者は、国土交通大臣の免許を受けなければならない。"},
+{c:"gyo",q:"宅建業の免許の有効期間（使える期間）は3年である。",a:false,
+ exp:`<p>宅建業の免許は<mark>5年</mark>使えます。3年ではありません。</p><p>5年たっても続けたいときは、期限が切れる<b>90日前から30日前まで</b>の間に更新（こうしん）の申請をします。</p><p>「宅建士証」も5年。宅建の世界は<b>「5」がよく出てくる</b>と覚えておくと便利です。</p>`,
+ pt:"免許の有効期間は5年。更新の申請は満了の90日前〜30日前",
+ hon:"宅地建物取引業の免許の有効期間は3年とし、更新を受けようとする者は、有効期間満了の日の90日前から30日前までの間に申請しなければならない。"},
+{c:"gyo",q:"宅建業者の事務所には、そこで働く人「5人に1人以上」の割合で、専任（せんにん）の宅建士を置かなければならない。",a:true,
+ exp:`<p>お客さんに大事な説明ができるのは宅建士だけ。だから事務所には、宅建士を必ず置くルールがあります。</p><p>割合は、<mark>そこで働く人5人につき1人以上</mark>。たとえば12人働いているなら、12÷5＝2.4 → 切り上げて<b>3人以上</b>必要です。</p><p>「専任」とは、その事務所にいつもいて、その会社の仕事を専門にしている、という意味です。</p>`,
+ pt:"事務所の専任の宅建士は「5人に1人以上」（端数は切り上げ）",
+ hon:"宅地建物取引業者は、その事務所ごとに、その業務に従事する者の数に対し5分の1以上の割合となる数の成年者である専任の宅地建物取引士を置かなければならない。",
+ w:[["専任","せんにん","その事務所に常にいて、その仕事に専念していること"]]},
+{c:"gyo",q:"重要事項の説明は、契約が終わった後にすればよい。",a:false,fig:"tl",
+ exp:`<p>重要事項の説明（じゅうようじこうのせつめい）とは、「この家にはこんな決まりがありますよ」「お金の払い方はこうですよ」など、<b>買う前に知っておくべき大事なこと</b>を説明することです。</p><p>買ったあとで聞いても手おくれですよね。だから<mark>契約が成立する「前」</mark>に説明しなければなりません。</p><p>法律の35条に書いてあるので「35条書面」とも呼ばれます。</p>`,
+ pt:"重要事項の説明（35条）は、契約の「前」に",
+ hon:"宅地建物取引業者は、売買契約が成立した後、遅滞なく、宅地建物取引士をして重要事項の説明をさせなければならない。"},
+{c:"gyo",q:"重要事項の説明は、宅建士でなくても、その会社の社員ならだれでもできる。",a:false,
+ exp:`<p>重要事項の説明は、専門の知識がある<mark>宅建士にしかできない</mark>仕事です。</p><p>宅建士だけができる仕事は、次の3つです。</p><p>① 重要事項の説明をする<br>② 重要事項説明書（35条書面）に名前を書く（記名）<br>③ 契約の内容を書いた書面（37条書面）に名前を書く（記名）</p><p>この3つがあるから、宅建士という資格に価値があるのです。</p>`,
+ pt:"宅建士だけの仕事は3つ：説明・35条書面に記名・37条書面に記名",
+ hon:"宅地建物取引業者は、宅地建物取引士でない従業者に、重要事項の説明をさせることができる。"},
+{c:"gyo",q:"宅建士が重要事項の説明をするときは、お客さんから「見せて」と言われなくても、宅建士証を見せなければならない。",a:true,fig:"tl",
+ exp:`<p>宅建士証（たっけんししょう）は、宅建士であることを証明するカードです。</p><p>重要事項の説明のときは、「私は本物の宅建士です」と示すために、<mark>言われなくても必ず提示</mark>します。見せなかった場合は罰（過料）があります。</p><p>ふだんの取引では「見せて」と言われたときに見せればOK。<b>重要事項の説明のときだけは自分から</b>、と区別して覚えましょう。</p>`,
+ pt:"重要事項の説明のときは、請求がなくても宅建士証を提示",
+ hon:"宅地建物取引士は、重要事項の説明をするときは、説明の相手方から請求がなくても、宅地建物取引士証を提示しなければならない。"},
+{c:"gyo",q:"宅建業者が売主と買主のあいだをなかだちして契約がまとまったら、契約内容を書いた書面（37条書面）を、売主と買主の両方に渡さなければならない。",a:true,fig:"tl",
+ exp:`<p>契約がまとまったら、「何を、いくらで、いつ引き渡すか」など、決まった内容を書面にして渡します。これが<b>37条書面</b>です（法律の37条に書いてあるから）。</p><p>重要事項の説明は「買う人」だけが相手でしたが、37条書面は<mark>契約した両方の人</mark>に渡します。約束の内容は、どちらにとっても大事だからです。</p><p>タイミングは<b>契約の後、遅れずに</b>。宅建士が記名します。</p>`,
+ pt:"37条書面は「契約の後」「両方の当事者」に交付",
+ hon:"宅地建物取引業者が売買の媒介をした場合、37条書面を売主及び買主の双方に交付しなければならない。"},
+{c:"gyo",q:"宅建業者が売る家を、ふつうの人が喫茶店で「買います」と申し込んだ。この人は、クーリング・オフについて書面で教えてもらった日から8日以内なら、申込みをやめることができる。",a:true,fig:"cooling",
+ exp:`<p><b>クーリング・オフ</b>は「頭を冷やして考え直す」ための制度です。</p><p>喫茶店や自宅など、<b>落ち着いて考えにくい場所</b>で申し込んだ人は、あとから冷静になって「やっぱりやめます」と言えます。</p><p>期限は、クーリング・オフができることを<mark>書面で告げられた日から数えて8日間</mark>。告げられた日を1日目として数えます。</p>`,
+ pt:"事務所などの以外で申込み → 書面で告げられた日から8日以内ならクーリング・オフ可",
+ hon:"宅地建物取引業者Aが自ら売主となる宅地の売買契約について、宅建業者でない買主Bが喫茶店で買受けの申込みをした場合、Bは、クーリング・オフについて書面で告げられた日から起算して8日を経過するまでは、申込みの撤回をすることができる。",
+ w:[["申込みの撤回","もうしこみのてっかい","出した申込みを取り消して、なかったことにすること"]]},
+{c:"gyo",q:"宅建業者の事務所で「買います」と申し込んだ場合でも、クーリング・オフはできる。",a:false,fig:"cooling",
+ exp:`<p>クーリング・オフは、<b>落ち着いて考えられない場所</b>で申し込んだ人を守る制度です。</p><p>宅建業者の<mark>事務所は、自分から出かけて行って、落ち着いて話を聞ける場所</mark>なので、クーリング・オフはできません。</p><p>ほかに「案内所（土地に定着したもの）」や、<b>買う人が自分から「自宅か勤め先に来て」と言った場合</b>も、クーリング・オフはできません。</p>`,
+ pt:"事務所・案内所など、買主が自分から呼んだ自宅・勤務先 → クーリング・オフ不可",
+ hon:"宅地建物取引業者Aの事務所において買受けの申込みをした宅建業者でない買主Bは、クーリング・オフにより申込みの撤回をすることができる。"},
+{c:"gyo",q:"クーリング・オフで申込みをやめるときは、電話で伝えるだけでよい。",a:false,fig:"cooling",
+ exp:`<p>クーリング・オフは、<mark>書面で</mark>しなければなりません。</p><p>電話だと「言った」「言ってない」でもめてしまうからです。紙に残せば、あとで証拠になります。</p><p>そして、効き目が出るのは<b>書面を出した時</b>（発信した時）。8日目にポストに入れれば、届くのが9日目になってもセーフです。</p>`,
+ pt:"クーリング・オフは書面で。効き目は「出した時」",
+ hon:"申込みの撤回等は、書面により行わなければならず、その効力は、当該書面を発した時に生ずる。"},
+{c:"gyo",q:"宅建業者が売主、ふつうの人が買主のとき、3,000万円の家の手付金として700万円を受け取ってもよい。",a:false,fig:"tetsuke",
+ exp:`<p>手付金（てつけきん）は、契約のときに先に払っておくお金です。</p><p>プロの宅建業者がふつうの人から、あまりにたくさんの手付金を取るのは不公平。だから<mark>代金の20%（2割）まで</mark>と決まっています。</p><p>3,000万円 × 20% ＝ <b>600万円</b>。700万円は多すぎるので×です。</p>`,
+ pt:"業者が売主・素人が買主 → 手付金は代金の20%まで",
+ hon:"宅地建物取引業者Aが自ら売主として、宅建業者でないBと代金3,000万円の建物の売買契約を締結する際、Aは、Bから手付金700万円を受領することができる。",
+ w:[["手付金","てつけきん","契約のしるしに先に払うお金。原則として、相手が準備を始める前ならこれを手放して契約をやめられる"]]},
+{c:"gyo",q:"手付金を代金の20%までにするなどの「8種制限」は、宅建業者どうしの取引でも同じように守らなければならない。",a:false,
+ exp:`<p>8種制限（はっしゅせいげん）は、<b>プロ（宅建業者）が売主で、素人（ふつうの人）が買主</b>のときだけのルールです。</p><p>素人は知識が少ないので、損をしないように守ってあげる必要があります。でも<mark>プロどうしの取引なら、お互いに知識があるので、8種制限はかかりません</mark>。</p><p>クーリング・オフや手付金20%のルールも、この8種制限の仲間です。</p>`,
+ pt:"8種制限は「業者が売主 × 業者でない人が買主」のときだけ",
+ hon:"宅地建物取引業者相互間の取引においても、手付の額の制限等のいわゆる8種制限の規定が適用される。"},
+{c:"gyo",q:"1,000万円の土地の売買をなかだちした宅建業者が、売主から受け取れる報酬（手数料）の上限は、36万円（＋消費税）である。",a:true,fig:"hoshu",
+ exp:`<p>不動産屋さんの手数料には上限があります。代金を3つの部分に分けて計算します。</p><p>・200万円までの部分 → 5%<br>・200万円〜400万円の部分 → 4%<br>・400万円をこえる部分 → 3%</p><p>1,000万円なら、200万×5%＝10万、200万×4%＝8万、600万×3%＝18万。合計<b>36万円</b>。</p><p>実は「<mark>代金 × 3% ＋ 6万円</mark>」で一発で出せます（400万円をこえる場合）。1,000万×3%＋6万＝36万円。</p>`,
+ pt:"400万円をこえる売買の報酬上限 ＝ 代金×3%＋6万円（＋消費税）",
+ hon:"宅地建物取引業者（消費税課税事業者）が、代金1,000万円の宅地の売買の媒介をした場合、売主から受領できる報酬の上限額は、39万6,000円（消費税込み）である。"},
+{c:"gyo",q:"宅建業者が商売を始めるとき、自分で供託所（きょうたくしょ）にお金を預ける場合、その額は本店1,000万円、支店1か所につき500万円である。",a:true,fig:"hosho",
+ exp:`<p>もし宅建業者がお客さんに損をさせても、ちゃんとお金を返せるように、<b>先にお金を預けておく</b>しくみがあります。これを<b>営業保証金（えいぎょうほしょうきん）</b>といいます。</p><p>金額は<mark>本店1,000万円、支店1か所ごとに500万円</mark>。本店と支店2つなら、1,000＋500×2＝2,000万円です。</p><p>大きな金額なので、多くの業者は「保証協会」に入ります。そうすると、本店60万円・支店30万円と、ぐっと少なくてすみます。</p>`,
+ pt:"営業保証金：本店1,000万・支店500万／保証協会：本店60万・支店30万",
+ hon:"営業保証金の額は、主たる事務所につき1,000万円、その他の事務所につき事務所ごとに500万円の割合による金額の合計額である。",
+ w:[["供託所","きょうたくしょ","お金などを預かってくれる国の機関（法務局など）"]]},
+{c:"gyo",q:"建てる前のマンションは、建築確認（けんちくかくにん）を受ける前でも、「もうすぐ完成！」と広告を出してよい。",a:false,
+ exp:`<p>建築確認とは、「この建物の設計は法律に合っていますよ」と役所などからOKをもらうことです。</p><p>OKが出る前は、<b>本当にその建物が建つかどうか分かりません</b>。それなのに広告を出すと、お客さんがだまされてしまうかもしれません。</p><p>だから<mark>建築確認などの許可が出る前は、広告を出してはいけない</mark>のです。売買の契約をすることもできません。</p>`,
+ pt:"工事完了前は、建築確認・開発許可が出るまで広告禁止",
+ hon:"宅地建物取引業者は、建築に関する工事の完了前においては、建築確認を受ける前であっても、当該建物の売買に関する広告をすることができる。"},
+{c:"gyo",q:"宅建士証の有効期間（使える期間）は5年である。",a:true,
+ exp:`<p>宅建士として仕事をするには、試験に合格して、登録して、<b>宅建士証</b>をもらう必要があります。</p><p>宅建士証は<mark>5年間</mark>使えます。新しくもらうときは、原則として都道府県知事が決めた<b>講習（法定講習）</b>を受けます。ただし試験に受かって1年以内なら、この講習は受けなくてもOKです。</p><p>免許も5年、宅建士証も5年。セットで覚えましょう。</p>`,
+ pt:"宅建士証の有効期間は5年（免許と同じ）",
+ hon:"宅地建物取引士証の有効期間は、5年とする。"},
+{c:"gyo",q:"重要事項の説明は、買う人（買主）だけでなく、売る人（売主）にもしなければならない。",a:false,fig:"tl",
+ exp:`<p>重要事項の説明は、これから<b>物件を手に入れる人</b>を守るためのものです。</p><p>売る人は、自分の物件のことをもともとよく知っています。だから<mark>説明する相手は「買う人」と「借りる人」だけ</mark>。売主や貸主には必要ありません。</p><p>覚え方：「<b>お金を払ってもらう側（買主・借主）</b>に説明」。</p>`,
+ pt:"重要事項の説明の相手は、買主・借主（売主・貸主には不要）",
+ hon:"宅地建物取引業者は、宅地の売買の媒介を行う場合、売主及び買主の双方に対して、重要事項の説明をしなければならない。"},
+
+/* 権利関係 */
+{c:"ken",q:"17歳の人が、親の同意をもらわずに土地を売る契約をした。この契約は、原則としてあとで取り消すことができる。",a:true,
+ exp:`<p>今の法律では、<b>18歳になるまでは「未成年者」</b>です（2022年4月から18歳に変わりました）。</p><p>未成年者は、まだ経験が少なく、だまされたり損をしたりしやすいので、法律が守ってくれます。<mark>親（法定代理人）の同意なしにした契約は、原則として取り消せます</mark>。</p><p>ただし、おこづかいの範囲で使うお金など、例外もあります。</p>`,
+ pt:"未成年者（18歳未満）が同意なしでした契約 → 原則取り消せる",
+ hon:"未成年者が法定代理人の同意を得ずに土地の売買契約を締結した場合、当該未成年者は、原則として、その契約を取り消すことができる。",
+ w:[["法定代理人","ほうていだいりにん","法律で決まっている代わりの人。未成年者なら、ふつうは親"]]},
+{c:"ken",q:"AはBにだまされて（詐欺）、自分の土地をBに売った。その後、Bはその土地をCに売った。Cがだましたことを知らず、知らないことに落ち度もなかった場合、AはCに「返して」と言えない。",a:true,fig:"sagi",
+ exp:`<p>だまされて結んだ契約は、取り消すことができます。でも、そのあいだに<b>何も知らないCさん</b>が買っていたらどうでしょう？</p><p>Aさんにも「だまされた」という少しの不注意があります。何も知らず、落ち度もないCさんを犠牲にするのはかわいそう。だから<mark>Aは、善意・無過失のCには取消しを主張できない</mark>のです。</p><p>「善意」は法律では<b>「知らない」</b>という意味。「いい人」という意味ではないので注意！</p>`,
+ pt:"詐欺の取消しは、善意・無過失の第三者には対抗できない",
+ hon:"AがBの詐欺により自己所有の土地をBに売却し、Bがその事情を知らず過失もないCに転売した場合、Aは詐欺を理由とする取消しをCに対抗することができない。",
+ w:[["善意","ぜんい","ある事情を「知らない」こと（法律用語）"],["悪意","あくい","ある事情を「知っている」こと（法律用語）"],["無過失","むかしつ","落ち度がないこと"]]},
+{c:"ken",q:"AはBにおどされて（強迫）、自分の土地をBに売った。その後Bがその土地を、何も知らないCに売った。この場合でも、Aは契約を取り消して、Cに「土地を返して」と言える。",a:true,fig:"sagi",
+ exp:`<p>今度は、だまされたのではなく、<b>おどされた</b>場合です。</p><p>おどされた人には、何の落ち度もありません。こわくて逆らえなかったのですから。だから法律は、だまされた人よりも<mark>強く守ってくれます</mark>。</p><p>Cさんが何も知らなかったとしても、<b>Aは取り消してCに対抗できます</b>。</p>`,
+ pt:"強迫の取消しは、善意の第三者にも対抗できる（詐欺とのちがい）",
+ hon:"AがBの強迫により土地をBに売却し、Bが善意無過失のCに転売した場合、Aは強迫を理由とする取消しをCに対抗することができる。",
+ w:[["強迫","きょうはく","おどして、むりやり何かをさせること（民法での書き方）"]]},
+{c:"ken",q:"Aが自分の土地を、まずBに売る約束をし、そのあとCにも売る約束をした。この場合、先に約束したBが必ず土地をもらえる。",a:false,fig:"nijuu",
+ exp:`<p>1つの土地を2人に売ってしまうことを<b>二重譲渡（にじゅうじょうと）</b>といいます。</p><p>このとき勝つのは、先に約束した人ではなく、<mark>先に「登記（とうき）」をした人</mark>です。</p><p>登記とは、法務局にある「この土地はだれのもの」という公式の記録に、自分の名前をのせること。登記を見れば、だれでも持ち主が分かります。だから<b>登記がものを言う</b>ルールになっています。</p>`,
+ pt:"二重譲渡は、先に登記をした方が勝つ",
+ hon:"AがBに甲土地を売却した後、Cにも甲土地を売却し、Cが先に所有権移転登記を備えた場合、Bは、Cに対して甲土地の所有権を主張することができる。",
+ w:[["登記","とうき","土地や建物の持ち主などを、法務局の公式な記録にのせること"]]},
+{c:"ken",q:"代理権をもらっていない人が、勝手にAさんの代わりに土地を売る契約をした。でも、Aさんがあとから「それでいいよ」と認めれば、その契約はAさんの契約として有効になる。",a:true,fig:"dairi",
+ exp:`<p>代理とは、<b>本人のかわりに契約をする</b>ことです。ふつうは本人から「代理権」をもらって行います。</p><p>代理権がないのに勝手にした契約を<b>無権代理（むけんだいり）</b>といい、そのままでは本人に効き目がありません。</p><p>でも、本人が「その契約、いいよ」と認めること（<mark>追認（ついにん）</mark>）をすれば、<b>はじめから有効な契約だった</b>ことになります。</p>`,
+ pt:"無権代理でも、本人が追認すれば契約のときにさかのぼって有効",
+ hon:"代理権を有しない者がした契約は、本人がその追認をしなければ、本人に対してその効力を生じない。",
+ w:[["追認","ついにん","あとから「それでいい」と認めること"],["無権代理","むけんだいり","代理権がないのに代理人として契約すること"]]},
+{c:"ken",q:"銀行からお金を借りて、自分の家に抵当権（ていとうけん）をつけても、その家に住み続けることができる。",a:true,fig:"teitou",
+ exp:`<p>抵当権は、お金を貸した人（銀行）が、「<b>もし返してもらえなかったら、この家を売ってお金にします</b>」という予約のような権利です。</p><p>ポイントは、<mark>家を銀行に渡す必要がない</mark>こと。だから、ローンを払いながら今までどおり住めます。</p><p>返せなくなったときは、家が競売（けいばい）にかけられ、その売ったお金から銀行が先に回収します。</p>`,
+ pt:"抵当権は、家を引き渡さずに担保にできる（住み続けられる）",
+ hon:"抵当権の設定者は、抵当権設定後も、抵当不動産を使用収益することができる。",
+ w:[["抵当権","ていとうけん","お金を返してもらえないとき、その不動産を売って優先的に回収できる権利"],["競売","けいばい","裁判所を通して物件を売りに出すこと"]]},
+{c:"ken",q:"本当は他人の土地なのに、自分の土地だと信じ、そう信じたことに落ち度もなく、10年間おだやかに使い続けた人は、その土地を自分のものにできる。",a:true,
+ exp:`<p>これを<b>取得時効（しゅとくじこう）</b>といいます。長い間続いた状態を、法律が「本当のこと」として認めるしくみです。</p><p>・自分のものだと信じ、落ち度もない（<b>善意・無過失</b>）→ <mark>10年</mark><br>・それ以外（他人のものだと知っていた等）→ <mark>20年</mark></p><p>どちらの場合も「自分のものとして（所有の意思）」「おだやかに・堂々と」使っていることが必要です。</p>`,
+ pt:"取得時効：善意・無過失なら10年、それ以外は20年",
+ hon:"所有の意思をもって、平穏に、かつ、公然と他人の物を占有した者は、その占有の開始の時に善意であり、かつ、過失がなかったときは、10年間の占有により、その所有権を取得する。"},
+{c:"ken",q:"お金を返してもらう権利は、「返してもらえる」と知った時から5年間何もしないと、時効で消えてしまう。",a:true,
+ exp:`<p>権利を長い間使わないでいると、なくなってしまうことがあります。これを<b>消滅時効（しょうめつじこう）</b>といいます。</p><p>お金を返してもらう権利（債権）は、<br>・<mark>権利を使えると知った時から5年</mark><br>・権利を使えるようになった時から10年<br>のどちらか早いほうで消えます。</p><p>「権利の上にねむる者は保護しない」という考え方です。</p>`,
+ pt:"債権の消滅時効：知った時から5年／使える時から10年（早いほう）",
+ hon:"債権は、債権者が権利を行使することができることを知った時から5年間行使しないときは、時効によって消滅する。",
+ w:[["債権","さいけん","人に「〜してください」と言える権利。お金を返してもらう権利など"]]},
+{c:"ken",q:"アパートの部屋を借りて住んでいる人は、大家さんがその建物を別の人に売っても、カギをもらって住んでいれば、新しい持ち主に「ここを借りています」と言える。",a:true,fig:"shakuchi",
+ exp:`<p>建物を借りている人は、<b>借地借家法（しゃくちしゃっかほう）</b>という法律で特に守られています。</p><p>本来なら「登記」がないと新しい持ち主に対抗できません。でも借家の場合は、<mark>建物の引渡し（カギをもらって住んでいる状態）</mark>があれば対抗できます。</p><p>家を借りるたびに登記をするのは大変なので、住んでいるという事実で守ってくれるのです。</p>`,
+ pt:"借家の対抗要件は「引渡し」でOK",
+ hon:"建物の賃貸借は、その登記がなくても、建物の引渡しがあったときは、その後その建物について物権を取得した者に対し、その効力を生ずる。",
+ w:[["対抗","たいこう","第三者に対して「これは自分の権利だ」と主張できること"]]},
+{c:"ken",q:"家を建てるために土地を借りる契約（借地契約）で、期間を20年と決めても、その期間は30年になる。",a:true,fig:"shakuchi",
+ exp:`<p>建物を建てるための土地を借りる権利を<b>借地権（しゃくちけん）</b>といいます。</p><p>家を建てたのに、すぐに「出て行って」と言われたら困りますよね。だから借地権は<mark>最低30年</mark>と決まっています。</p><p>30年より短い期間を決めても、<b>30年</b>になります。30年より長い期間（たとえば50年）を決めるのはOKです。</p>`,
+ pt:"借地権の期間は30年以上。短く決めても30年になる",
+ hon:"借地権の存続期間は30年とする。ただし、契約でこれより長い期間を定めたときは、その期間とする。"},
+{c:"ken",q:"ふつうの借家契約で、期間を「6か月」と決めた場合、それは「期間の定めがない契約」として扱われる。",a:true,fig:"shakuchi",
+ exp:`<p>建物の貸し借り（借家）でも、借りる人は守られています。</p><p>ふつうの借家契約で<mark>1年未満の期間</mark>を決めると、その期間は認められず、<b>期間の定めがない契約</b>とみなされます。</p><p>そうすると、大家さんがやめたいときには、<b>正当な理由</b>と<b>6か月前の申入れ</b>が必要になり、借りる人が急に追い出されにくくなります。</p>`,
+ pt:"普通借家で1年未満の期間 → 期間の定めがない契約とみなす",
+ hon:"期間を1年未満とする建物の賃貸借（定期建物賃貸借等を除く）は、期間の定めがない建物の賃貸借とみなす。"},
+{c:"ken",q:"夫が亡くなり、妻と子ども2人が相続する場合、法律で決まった取り分（法定相続分）は、妻が2分の1、子どもはそれぞれ4分の1である。",a:true,fig:"souzoku",
+ exp:`<p>亡くなった人の財産を家族が受けつぐことを<b>相続（そうぞく）</b>といいます。</p><p>配偶者（夫や妻）と子どもが相続するときは、<mark>配偶者が1/2、子どもたち全員で1/2</mark>。子どもが2人なら、1/2を2人で分けて<b>1人1/4</b>です。</p><p>下の表のように、だれと一緒に相続するかで配偶者の取り分が増えていきます（1/2 → 2/3 → 3/4）。</p>`,
+ pt:"配偶者＋子 ＝ 1/2：1/2（子は人数で等分）",
+ hon:"被相続人に配偶者と子2人がいる場合、配偶者の法定相続分は2分の1、各子の法定相続分はそれぞれ4分の1である。",
+ w:[["配偶者","はいぐうしゃ","結婚している相手（夫や妻）"]]},
+{c:"ken",q:"亡くなった人の兄弟姉妹にも、「最低限これだけはもらえる」という遺留分（いりゅうぶん）がある。",a:false,
+ exp:`<p>遺言（ゆいごん）で「全部を友だちにあげる」と書いてあっても、家族には<b>最低限もらえる取り分</b>があります。これが<b>遺留分</b>です。</p><p>でも、<mark>兄弟姉妹には遺留分がありません</mark>。</p><p>兄弟姉妹は、ふつう別の家で生活しているので、配偶者や子どもほど生活を守る必要がない、と考えられているからです。</p>`,
+ pt:"遺留分があるのは配偶者・子・親など。兄弟姉妹にはない",
+ hon:"兄弟姉妹以外の相続人は、遺留分として一定の割合を受ける。（＝兄弟姉妹には遺留分がない）"},
+{c:"ken",q:"借金が多いので相続をしたくないときは、相続が始まったことを知った時から3か月以内に、家庭裁判所に「相続放棄（そうぞくほうき）」を申し出る。",a:true,
+ exp:`<p>相続では、プラスの財産だけでなく、<b>借金などのマイナスの財産も受けつぎます</b>。</p><p>借金のほうが多いときは、相続を全部やめる<b>相続放棄</b>ができます。</p><p>そのためには、<mark>自分が相続人になったと知った時から3か月以内</mark>に、<mark>家庭裁判所</mark>に申し出る必要があります。家族に言うだけではダメです。</p>`,
+ pt:"相続放棄は、知った時から3か月以内に家庭裁判所へ",
+ hon:"相続人は、自己のために相続の開始があったことを知った時から3か月以内に、家庭裁判所に申述して、相続の放棄をすることができる。"},
+{c:"ken",q:"相続で土地や建物をもらったことを知ったら、3年以内に相続の登記（名前の書きかえ）をしなければならない。",a:true,
+ exp:`<p>持ち主がだれか分からない土地が日本中で増えてしまい、大きな問題になりました。</p><p>そこで<mark>2024年4月から、相続登記が義務</mark>になりました。相続で不動産をもらったと知った日から<b>3年以内</b>に登記をします。</p><p>正当な理由がないのに登記をしないと、<b>10万円以下の過料</b>（お金を払う罰）になることがあります。</p>`,
+ pt:"相続登記は義務。知った日から3年以内（2024年4月〜）",
+ hon:"相続により不動産の所有権を取得した者は、自己のために相続の開始があったことを知り、かつ、当該所有権を取得したことを知った日から3年以内に、所有権の移転の登記を申請しなければならない。"},
+{c:"ken",q:"アパートを出るとき、ふつうに住んでいてできた汚れ（日焼けや家具のへこみなど）の修理代は、敷金から差し引くことができる。",a:false,
+ exp:`<p>敷金（しききん）は、部屋を借りるときに大家さんに預けるお金です。部屋をこわしたときなどの修理代に使われます。</p><p>でも、<mark>ふつうに暮らしていてできる汚れや古び（通常損耗）は、借りた人が直さなくてよい</mark>ことになっています。家賃の中に、もともとその分が含まれていると考えるからです。</p><p>ただし、タバコのこげ跡や、わざと壊したところなどは、借りた人が修理代を負担します。</p>`,
+ pt:"通常の使用による損耗・経年変化は、借主の原状回復義務に含まれない",
+ hon:"賃借人は、賃借物を受け取った後に生じた損傷について原状回復義務を負うが、通常の使用及び収益によって生じた損耗並びに賃借物の経年変化はこれに含まれない。",
+ w:[["敷金","しききん","借りるときに預けるお金。家賃の未払いや修理代にあて、残りは返してもらえる"]]},
+
+/* 法令上の制限 */
+{c:"hou",q:"市街化区域（しがいかくいき）とは、すでに街になっている所と、おおむね10年以内に優先して街にしていく所のことである。",a:true,fig:"toshi",
+ exp:`<p>まちづくりをするために、「<b>都市計画区域</b>」という大きなエリアを決めます。その中を、さらに2つに分けます（線引き）。</p><p>・<mark>市街化区域</mark>：すでに街になっている所＋<b>おおむね10年以内に</b>優先して街にする所<br>・<b>市街化調整区域</b>：街になるのをおさえる所（田んぼや山を守る）</p><p>図を見ながら、「街をつくる所」と「街をおさえる所」とイメージしましょう。</p>`,
+ pt:"市街化区域 ＝ 既に市街地＋おおむね10年以内に優先的に市街化",
+ hon:"市街化区域は、すでに市街地を形成している区域及びおおむね10年以内に優先的かつ計画的に市街化を図るべき区域である。"},
+{c:"hou",q:"市街化調整区域は、どんどん建物を建てて、街を広げていくための区域である。",a:false,fig:"toshi",
+ exp:`<p>名前がまぎらわしいですが、市街化「<b>調整</b>」区域は、<mark>街になるのをおさえる区域</mark>です。</p><p>田んぼや林などの自然を残すため、原則として建物を建てたり、土地を開発したりすることがきびしく制限されています。</p><p>「調整＝ブレーキをかける」と覚えましょう。</p>`,
+ pt:"市街化調整区域 ＝ 市街化を「抑制」する区域",
+ hon:"市街化調整区域は、市街化を抑制すべき区域である。"},
+{c:"hou",q:"市街化区域には、少なくとも用途地域（ようとちいき）を定めることになっている。",a:true,
+ exp:`<p><b>用途地域</b>は、「ここは住宅のための場所」「ここはお店や工場のための場所」というように、<b>土地の使いみちを決めたエリア</b>です。</p><p>静かな住宅街のとなりに大きな工場が建ったら困りますよね。それを防ぐしくみです。</p><p>街をつくる市街化区域では、<mark>必ず用途地域を定めます</mark>。反対に、市街化調整区域には<b>原則として定めません</b>。</p>`,
+ pt:"市街化区域 → 用途地域を必ず定める／市街化調整区域 → 原則定めない",
+ hon:"市街化区域については、少なくとも用途地域を定めるものとし、市街化調整区域については、原則として用途地域を定めないものとする。"},
+{c:"hou",q:"用途地域は全部で13種類ある。",a:true,
+ exp:`<p>用途地域は、大きく分けて3グループ、全部で<mark>13種類</mark>です。</p><p>・<b>住居系（8種類）</b>：第一種低層住居専用地域、田園住居地域など<br>・<b>商業系（2種類）</b>：近隣商業地域、商業地域<br>・<b>工業系（3種類）</b>：準工業地域、工業地域、工業専用地域</p><p>8＋2＋3＝13。いちばん新しいのは2018年にできた「田園住居地域」です。</p>`,
+ pt:"用途地域は13種類（住居系8・商業系2・工業系3）",
+ hon:"都市計画法に定める用途地域は、田園住居地域を含めて13種類である。"},
+{c:"hou",q:"広さ100㎡の土地で、建ぺい率（けんぺいりつ）が60%なら、建物を建てられる面積（建築面積）は60㎡までである。",a:true,fig:"kenpei",
+ exp:`<p><b>建ぺい率</b>は、<mark>土地の広さに対して、建物で覆っていい面積の割合</mark>です。上から見たときの建物の広さ、と考えると分かりやすいです。</p><p>100㎡ × 60% ＝ <b>60㎡</b>。残りの40㎡は空けておきます。</p><p>全部を建物でうめつくさないのは、風通しや日当たりをよくして、火事が広がりにくくするためです。</p>`,
+ pt:"建ぺい率 ＝ 建築面積 ÷ 敷地面積",
+ hon:"建築物の建築面積の敷地面積に対する割合（建ぺい率）は、都市計画で定められた数値以下でなければならない。"},
+{c:"hou",q:"広さ100㎡の土地で、容積率（ようせきりつ）が200%なら、建物のすべての階の床面積を合計して200㎡まで建てられる。",a:true,fig:"kenpei",
+ exp:`<p><b>容積率</b>は、<mark>土地の広さに対して、全部の階の床面積を合計した広さ（延べ面積）の割合</mark>です。</p><p>100㎡ × 200% ＝ <b>200㎡</b>。たとえば1階あたり50㎡なら4階まで、100㎡なら2階まで、という計算です。</p><p>建ぺい率は「横の広がり」、容積率は「建物全体のボリューム」をおさえるルールです（ほかに道路の幅による制限などもあります）。</p>`,
+ pt:"容積率 ＝ 延べ面積 ÷ 敷地面積",
+ hon:"建築物の延べ面積の敷地面積に対する割合（容積率）は、都市計画で定められた数値以下でなければならない。"},
+{c:"hou",q:"建物を建てる土地は、原則として、幅4m以上の道路に2m以上接していなければならない。",a:true,fig:"setsudo",
+ exp:`<p>これを<b>接道義務（せつどうぎむ）</b>といいます。</p><p>火事のときに消防車が来られなかったり、救急車が入れなかったりすると大変です。だから、建物を建てる土地は<mark>幅4m以上の道路に、2m以上くっついている</mark>必要があります。</p><p>図のような「旗竿地（はたざおち）」でも、道路に接する部分が2m以上あればOKです。</p>`,
+ pt:"接道義務：幅4m以上の道路に2m以上接する",
+ hon:"建築物の敷地は、原則として、道路（幅員4m以上）に2m以上接しなければならない。"},
+{c:"hou",q:"市街化区域で1,000㎡以上の土地を開発（造成）するときは、原則として、都道府県知事などの許可が必要である。",a:true,fig:"kaihatsu",
+ exp:`<p>家を建てるために、山を切り開いたり、土地の形を変えたりすることを<b>開発行為</b>といいます。</p><p>大きな開発は周りへの影響も大きいので、許可が必要です。市街化区域では<mark>1,000㎡以上</mark>なら許可がいります（地域によっては500㎡などにもっと厳しくされることもあります）。</p><p>場所によって許可がいる広さがちがうので、表で比べてみましょう。</p>`,
+ pt:"開発許可：市街化区域は1,000㎡以上で必要（原則）",
+ hon:"市街化区域内において行う開発行為で、その規模が1,000㎡以上であるものは、原則として都道府県知事の許可を受けなければならない。"},
+{c:"hou",q:"市街化調整区域では、小さな土地の開発でも、原則として許可が必要である。",a:true,fig:"kaihatsu",
+ exp:`<p>市街化調整区域は「街になるのをおさえる所」でしたね。</p><p>だから、<mark>広さに関係なく、原則として開発許可が必要</mark>です。小さな開発でも、勝手にはできません。</p><p>ただし、農業や林業・漁業をする人の家や、そのための建物を建てる場合などは、例外として許可がいりません。</p>`,
+ pt:"市街化調整区域の開発は、規模に関係なく原則許可が必要",
+ hon:"市街化調整区域内において行う開発行為は、その規模にかかわらず、原則として都道府県知事の許可を受けなければならない。"},
+{c:"hou",q:"田んぼを、田んぼのまま他の農家に売るときは、農業委員会の許可が必要である。",a:true,fig:"nouchi",
+ exp:`<p>農地は、日本の食べ物を作る大切な場所です。勝手に売り買いされないよう、<b>農地法（のうちほう）</b>というルールがあります。</p><p>農地を<mark>農地のまま売ったり貸したりする</mark>ときは、農地法<b>3条</b>の許可が必要。許可を出すのは<mark>農業委員会</mark>です。</p><p>きちんと農業を続けられる人に渡るかどうかをチェックするためです。</p>`,
+ pt:"農地のまま権利移動 → 3条許可（農業委員会）",
+ hon:"農地を農地のまま売買する場合には、農地法第3条の許可を受ける必要があり、その許可権者は農業委員会である。"},
+{c:"hou",q:"市街化区域にある自分の畑をつぶして家を建てるときは、あらかじめ農業委員会に届け出れば、許可はいらない。",a:true,fig:"nouchi",
+ exp:`<p>農地を宅地などにかえることを<b>転用（てんよう）</b>といいます。自分の農地を転用するのは農地法<b>4条</b>で、ふつうは都道府県知事などの許可が必要です。</p><p>でも、<mark>市街化区域</mark>は「街をつくる所」でしたね。そこにある農地は、街にしていくのが自然です。</p><p>だから市街化区域なら、<b>あらかじめ農業委員会に届け出るだけ</b>でOKになります。</p>`,
+ pt:"市街化区域内の転用（4条・5条）→ 農業委員会への届出で足りる",
+ hon:"市街化区域内にある農地を、あらかじめ農業委員会に届け出て農地以外のものに転用する場合には、農地法第4条第1項の許可を受ける必要がない。"},
+{c:"hou",q:"市街化区域で2,000㎡以上の土地を買った人は、契約した日から2週間以内に届け出なければならない。",a:true,fig:"kokudo",
+ exp:`<p>大きな土地の取引は、土地の値段が上がりすぎたり、変な使われ方をしたりしないよう、国や県が見守っています。これが<b>国土利用計画法の事後届出（じごとどけで）</b>です。</p><p>市街化区域では<mark>2,000㎡以上</mark>の土地を取引したら届出が必要。<b>契約した日から2週間以内</b>に、市町村長を通して都道府県知事に届けます。</p>`,
+ pt:"事後届出：市街化区域2,000㎡以上、契約から2週間以内",
+ hon:"市街化区域内の2,000㎡以上の土地について売買契約を締結した場合、権利取得者は、契約締結日から起算して2週間以内に事後届出を行わなければならない。"},
+{c:"hou",q:"国土利用計画法の事後届出は、土地を売った人（売主）がしなければならない。",a:false,fig:"kokudo",
+ exp:`<p>届出をするのは、<mark>土地を買った人（権利を取得した人）</mark>です。売った人ではありません。</p><p>その土地を<b>これからどう使うか</b>を知りたいので、使う側である買主が届け出るのです。届出には、土地の利用目的や値段などを書きます。</p>`,
+ pt:"事後届出をするのは「買主（権利取得者）」",
+ hon:"国土利用計画法第23条の事後届出は、当事者の双方（売主及び買主）が共同して行わなければならない。"},
+
+/* 税・その他 */
+{c:"zei",q:"不動産取得税（ふどうさんしゅとくぜい）は、都道府県にはらう税金である。",a:true,fig:"zei",
+ exp:`<p>土地や家を<b>手に入れたとき</b>に、1回だけかかる税金が<b>不動産取得税</b>です。</p><p>はらう先は<mark>都道府県</mark>。国ではありません。</p><p>税金は「だれにはらうか」がよく試験に出ます。表で「国」「都道府県」「市町村」を区別しておきましょう。</p>`,
+ pt:"不動産取得税 ＝ 都道府県の税（取得したとき1回）",
+ hon:"不動産取得税は、不動産の取得に対し、当該不動産所在の道府県において、当該不動産の取得者に課される。"},
+{c:"zei",q:"親が亡くなって、相続で家をもらったときも、不動産取得税がかかる。",a:false,fig:"zei",
+ exp:`<p>不動産取得税は、土地や家を手に入れたときにかかる税金ですが、例外があります。</p><p><mark>相続でもらったときは、不動産取得税はかかりません</mark>（非課税）。</p><p>家族が亡くなって悲しいときに、さらに税金を取るのはひどい…というイメージで覚えましょう。（相続税という別の税金はかかることがあります。）</p>`,
+ pt:"相続による取得は、不動産取得税が非課税",
+ hon:"相続による不動産の取得に対しては、不動産取得税が課される。"},
+{c:"zei",q:"固定資産税（こていしさんぜい）は、毎年1月1日に、持ち主として登録されている人にかかる。",a:true,fig:"zei",
+ exp:`<p><b>固定資産税</b>は、土地や家を<b>持っている間、毎年</b>かかる税金です。</p><p>1年の途中で持ち主が変わったら、だれがはらうの？ という疑問が出ますよね。答えは、<mark>その年の1月1日に持ち主として登録されている人</mark>です。</p><p>はらう先は<b>市町村</b>（東京23区は東京都）です。</p>`,
+ pt:"固定資産税は「1月1日」の所有者に、市町村が課税",
+ hon:"固定資産税は、毎年1月1日現在において、固定資産課税台帳に所有者として登録されている者に対して課される。"},
+{c:"zei",q:"固定資産税は、国にはらう税金である。",a:false,fig:"zei",
+ exp:`<p>固定資産税は、<mark>市町村</mark>にはらう税金です（東京23区の場合は東京都）。国ではありません。</p><p>学校や道路など、身近なまちのサービスに使われます。</p><p>覚え方：<b>手に入れたら県（不動産取得税）、持っていたら市町村（固定資産税）</b>。</p>`,
+ pt:"固定資産税 ＝ 市町村の税",
+ hon:"固定資産税は、固定資産の所在する市町村において課する。"},
+{c:"zei",q:"人が住むための家が建っている土地（住宅用地）は、200㎡以下の部分について、固定資産税を計算するもとの金額が6分の1になる。",a:true,
+ exp:`<p>住む家の土地には、税金を安くするしくみがあります。</p><p>住宅用地のうち、<mark>200㎡以下の部分（小規模住宅用地）は、課税標準が6分の1</mark>になります。200㎡をこえる部分は3分の1です。</p><p>「課税標準」は、税金を計算するときのもとになる金額のこと。これが小さくなるので、税金も安くなります。</p>`,
+ pt:"住宅用地の固定資産税：200㎡以下の部分は課税標準1/6",
+ hon:"小規模住宅用地（住宅1戸につき200㎡以下の部分）に対して課する固定資産税の課税標準は、価格の6分の1の額とされる。",
+ w:[["課税標準","かぜいひょうじゅん","税金を計算するときの、もとになる金額"]]},
+{c:"zei",q:"紙で作った不動産の売買契約書には、印紙税（いんしぜい）がかかる。",a:true,fig:"zei",
+ exp:`<p>契約書などの文書を作ると、<b>印紙税</b>という国の税金がかかることがあります。収入印紙（しゅうにゅういんし）という切手のようなものを買って、書類にはって消印をします。</p><p>不動産の売買契約書は<mark>印紙税がかかる文書</mark>です。金額は書かれた代金によって変わります。</p><p>ちなみに、紙ではなく電子データで契約した場合は、印紙税はかかりません。</p>`,
+ pt:"不動産の売買契約書（紙）には印紙税がかかる",
+ hon:"土地の売買契約書は、印紙税の課税文書に該当する。"},
+{c:"zei",q:"登記をするときにかかる登録免許税（とうろくめんきょぜい）は、国の税金である。",a:true,fig:"zei",
+ exp:`<p>家を買って名前を登記するときなどに、<b>登録免許税</b>という税金をはらいます。</p><p>登記は国（法務局）が管理する記録なので、<mark>登録免許税は国の税金</mark>です。</p><p>まとめ：国＝登録免許税・印紙税、都道府県＝不動産取得税、市町村＝固定資産税。</p>`,
+ pt:"登録免許税・印紙税 ＝ 国の税",
+ hon:"登録免許税は、登記等を受ける者に課される国税である。"},
+{c:"zei",q:"不動産の広告で、駅から物件まで道のりで500mのとき、「駅から徒歩7分」と書くのは正しい。",a:true,fig:"toho",
+ exp:`<p>不動産の広告には、正しく書くためのルールがあります。</p><p>歩いてかかる時間は、<mark>道のり80mを1分</mark>として計算し、<b>1分未満のあまりは1分に切り上げ</b>ます。</p><p>500m ÷ 80m ＝ 6.25 → 切り上げて<b>7分</b>。「6分」と書くと、実際より近く見せてしまうのでダメです。</p>`,
+ pt:"徒歩時間は道路距離80mで1分、端数は切り上げ",
+ hon:"徒歩による所要時間は、道路距離80mにつき1分間を要するものとして算出した数値を表示し、1分未満の端数が生じたときは1分として算出する。"},
+{c:"zei",q:"不動産の広告で、「完全」「日本一」「最高」などの言葉は、はっきりした根拠がないのに使ってはいけない。",a:true,
+ exp:`<p>「日本一安い！」「絶対にお得！」と書かれていたら、つい信じてしまいますよね。</p><p>だから不動産の広告のルール（表示規約）では、<mark>「完全」「万全」「日本一」「最高」「格安」などの言葉は、根拠を示せない限り使えない</mark>ことになっています。</p><p>お客さんに本当より良く見せる（誤解させる）広告は禁止、という考え方です。</p>`,
+ pt:"「完全」「日本一」などの特定用語は、根拠がなければ使用禁止",
+ hon:"「日本一」「最高」等の用語は、当該表示内容を裏付ける合理的な根拠を示す資料を現に有している場合を除き、使用してはならない。"},
+{c:"zei",q:"地価公示（ちかこうじ）は、毎年1月1日時点の「標準地」の値段を、土地鑑定委員会が発表するものである。",a:true,
+ exp:`<p>土地の値段は、場所や時期によって変わります。そこで、<b>土地の値段の目安</b>を国が毎年発表しています。これが<b>地価公示</b>です。</p><p>全国から選んだ<b>標準地（ひょうじゅんち）</b>について、<mark>毎年1月1日時点</mark>の値段を、<mark>土地鑑定委員会（とちかんていいいんかい）</mark>が発表します。</p><p>土地を売り買いするときの目安として使われます。</p>`,
+ pt:"地価公示：標準地・1月1日時点・土地鑑定委員会",
+ hon:"土地鑑定委員会は、標準地について、毎年1月1日における単位面積当たりの正常な価格を判定し、公示するものとする。"},
+{c:"zei",q:"住宅金融支援機構（じゅうたくきんゆうしえんきこう）の主な仕事は、民間の銀行が貸した住宅ローンを買い取ること（証券化支援）である。",a:true,
+ exp:`<p>家を買うときにお金を貸してくれるのは、ふつうは民間の銀行です。</p><p><b>住宅金融支援機構</b>は、自分が直接お金を貸すのではなく、<mark>銀行が貸した住宅ローンを買い取って、銀行を後ろから支える</mark>のが主な仕事です。これを<b>証券化支援</b>といいます。</p><p>このしくみで生まれたのが、長い期間金利が変わらない住宅ローン「フラット35」です。災害で家を失った人などには、直接お金を貸すこともあります。</p>`,
+ pt:"住宅金融支援機構の柱は「証券化支援」（フラット35）",
+ hon:"独立行政法人住宅金融支援機構は、民間金融機関による住宅資金の貸付けを支援するため、貸付債権の譲受け（証券化支援業務）を行っている。"},
+{c:"zei",q:"台地（だいち）や段丘（だんきゅう）は、一般に水はけがよく、地盤もしっかりしているので、宅地に向いている。",a:true,
+ exp:`<p>家を建てる場所は、土地の性質も大事です。</p><p><mark>台地・段丘</mark>は、まわりより一段高くて平らな土地。水はけがよく、地盤もかたいので、<b>一般に宅地に向いています</b>。</p><p>反対に、低い土地や、川の近く、埋め立て地などは、洪水や地震のゆれ・液状化に注意が必要です。</p>`,
+ pt:"台地・段丘 → 一般に宅地向き／低地・埋立地 → 災害に注意",
+ hon:"台地、段丘は、農地として利用され、また都市的な土地利用も多く、地盤も安定していることから、一般に宅地に適している。"}
+];
+Q.forEach((q,i)=>{q.id=q.c+"-"+(Q.filter(x=>x.c===q.c).indexOf(q)+1)});
+
+/* ---------- 保存 ---------- */
+const KEY="takken-ox-v1";
+let store={res:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.res)store=s}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}};
+
+/* ---------- 画面 ---------- */
+const app=document.getElementById("app");
+let S={view:"home",list:[],i:0,picked:null,results:[],label:""};
+
+const header=()=>`<div class="top"><button class="brand" data-act="home" aria-label="ホームへ"><span class="seal">宅建</span><span><b>はじめての宅建○×</b><small>超基礎からの一問一答</small></span></button>${S.view!=="home"?`<button class="ghost" data-act="home">ホーム</button>`:""}</div>`;
+
+function fieldStat(c){const qs=Q.filter(q=>q.c===c);const ok=qs.filter(q=>store.res[q.id]&&store.res[q.id].ok).length;const done=qs.filter(q=>store.res[q.id]).length;return{n:qs.length,ok,done}}
+const wrongIds=()=>Q.filter(q=>store.res[q.id]&&!store.res[q.id].ok).map(q=>q.id);
+
+function home(){
+  const ok=Q.filter(q=>store.res[q.id]&&store.res[q.id].ok).length;
+  const pct=Math.round(ok/Q.length*100);
+  const w=wrongIds().length;
+  app.innerHTML=header()+`
+  <section class="hero">
+    <h1>宅建の大事なところを、<span class="ox">○</span>か<span class="ox">×</span>でひとつずつ。</h1>
+    <p>むずかしい法律の言葉を、できるだけやさしく言いかえました。答えると、図つきの解説と「本番ではこう書かれる」文が出ます。</p>
+    <div class="total"><span><strong>${ok}</strong> / ${Q.length}問 正解ずみ</span><span>${pct}%</span></div>
+    <div class="meter" aria-hidden="true"><i style="width:${pct}%"></i></div>
+  </section>
+  <div class="fields">${Object.entries(FIELDS).map(([k,f])=>{const s=fieldStat(k);return `
+    <button class="field" style="--fc:${f.color}" data-act="field" data-c="${k}">
+      <span class="tag">${f.tag}・本番${f.exam}問</span><h3>${f.name}</h3><p>${f.desc}</p>
+      <div class="meter" aria-hidden="true"><i style="width:${Math.round(s.ok/s.n*100)}%"></i></div>
+      <span class="stat"><span>正解 ${s.ok} / ${s.n}問</span><span>${s.done?`${s.done}問やった`:"まだ"}</span></span>
+      <span class="go">はじめる →</span></button>`}).join("")}</div>
+  <div class="row">
+    <button class="btn" data-act="all">全${Q.length}問をシャッフル</button>
+    <button class="btn sub" data-act="wrong" ${w?"":"disabled"}>まちがえた問題だけ（${w}問）</button>
+  </div>
+  <details class="panel" open>
+    <summary>宅建ってどんな試験？</summary>
+    <p><b>宅地建物取引士（たくちたてものとりひきし）</b>は、家や土地の取引で、お客さんに大事なことを説明する専門家です。不動産屋さんには、必ず一定の人数の宅建士がいます。</p>
+    <p>試験は毎年10月に1回。<b>50問・2時間</b>の4択で、合格ラインは年によって変わりますが、だいたい<b>50問中35〜38問くらい</b>です。</p>
+    <div class="stack" role="img" aria-label="50問の内訳：宅建業法20問、権利関係14問、法令上の制限8問、税・その他8問">
+      ${Object.values(FIELDS).map(f=>`<span style="width:${f.exam*2}%;background:${f.color}">${f.exam}問</span>`).join("")}
+    </div>
+    <div class="legend">${Object.values(FIELDS).map(f=>`<div><i style="background:${f.color}"></i>${f.name}<b>${f.exam}問</b></div>`).join("")}</div>
+    <p style="margin-top:10px">いちばん問題数が多く、覚えれば点になりやすいのが<b>宅建業法</b>。はじめての人は、宅建業法 → 権利関係 → 法令上の制限 → 税・その他 の順がおすすめです。</p>
+  </details>
+  <p class="foot">記録はこの端末のブラウザにだけ保存されます。問題文と解説は学習用にやさしく書き直したオリジナルです。法改正があるので、受験する年の最新テキストでも確認してください（内容は2026年10月時点の法令にもとづきます）。 <button class="ghost" data-act="reset" style="margin-left:4px">記録を消す</button></p>`;
+}
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(ids,label){S={view:"quiz",list:ids,i:0,picked:null,results:[],label};render();window.scrollTo(0,0)}
+
+function quiz(){
+  const q=Q.find(x=>x.id===S.list[S.i]);const f=FIELDS[q.c];const answered=S.picked!==null;
+  const ok=answered&&(S.picked===q.a);
+  let out=header()+`<div class="qhead" style="--fc:${f.color}"><span class="fl">${f.name}</span><span>${S.label}</span><span class="n">${S.i+1} / ${S.list.length}</span></div>
+  <div class="meter" aria-hidden="true"><i style="width:${(S.i+(answered?1:0))/S.list.length*100}%;background:${f.color}"></i></div>
+  <article class="qcard" style="--fc:${f.color}">
+    <div class="qno">Q. ${q.id.split("-")[1]}　○か×か？</div>
+    <div class="qtext">${q.q}</div>
+    <div class="choices">
+      <button class="choice o ${answered?(S.picked===true?"picked":"dim"):""}" data-act="pick" data-v="1" ${answered?"disabled":""}><span class="mk">○</span><span class="lb">正しい</span></button>
+      <button class="choice x ${answered?(S.picked===false?"picked":"dim"):""}" data-act="pick" data-v="0" ${answered?"disabled":""}><span class="mk">×</span><span class="lb">まちがい</span></button>
+    </div>`;
+  if(!answered){out+=`<div class="kbd">キーボードなら O / X で答えられます</div></article>`;app.innerHTML=out;return}
+  const fig=q.fig&&FIGS[q.fig];
+  out+=`<div class="verdict ${ok?"ok":"ng"}" role="status"><span class="big">${ok?"○":"×"}</span><div><h3>${ok?"正解！":"ざんねん"}</h3><p>この文は「<b>${q.a?"○ 正しい":"× まちがい"}</b>」です</p></div></div>
+    <div class="exp">
+      <div><h4>かんたん解説</h4><div class="body">${q.exp}</div></div>
+      ${fig?`<figure class="fig" style="margin:0">${fig.html()}<figcaption class="cap">${fig.cap}</figcaption></figure>`:""}
+      <div class="point">${q.pt}</div>
+      <div class="hon"><span class="lbl">本番の試験では、こんな書き方で出ます</span>「${q.hon}」<br><b>→ ${q.a?"正しい":"誤り"}</b></div>
+      ${q.w?`<div><h4>ことばメモ</h4><dl class="words">${q.w.map(w=>`<div><dt><ruby>${w[0]}<rt>${w[1]}</rt></ruby></dt><dd>${w[2]}</dd></div>`).join("")}</dl></div>`:""}
+    </div>
+    <div class="qnav"><button class="btn" data-act="next" id="nextBtn">${S.i+1<S.list.length?"次の問題へ":"結果を見る"}</button></div>
+  </article>`;
+  app.innerHTML=out;
+}
+
+function end(){
+  const n=S.results.length,ok=S.results.filter(r=>r.ok).length;
+  const miss=S.results.filter(r=>!r.ok);
+  const msg=ok===n?"全問正解！ この調子で次の分野へ。":ok/n>=.7?"よくできました。まちがえた所だけ、もう一度見ておきましょう。":"だいじょうぶ。解説を読んで、もう一度チャレンジすれば必ず覚えられます。";
+  app.innerHTML=header()+`<section class="end">
+    <span class="qhead">${S.label} の結果</span>
+    <div class="score">${ok}<small> / ${n}問</small></div>
+    <p style="margin:0">${msg}</p>
+    ${miss.length?`<div class="miss"><b style="font-size:14px">まちがえた問題</b>${miss.map(r=>{const q=Q.find(x=>x.id===r.id);return `<button data-act="one" data-id="${q.id}"><b>×</b>${q.q}</button>`}).join("")}</div>`:""}
+    <div class="row">${miss.length?`<button class="btn" data-act="retry">まちがえた${miss.length}問をやり直す</button>`:""}<button class="btn sub" data-act="home">ホームへ</button></div>
+  </section>`;
+}
+
+function render(){S.view==="home"?home():S.view==="quiz"?quiz():end()}
+
+function pick(v){
+  if(S.picked!==null)return;
+  const q=Q.find(x=>x.id===S.list[S.i]);S.picked=v;
+  const ok=v===q.a;const r=store.res[q.id]||{n:0};
+  store.res[q.id]={ok,n:r.n+1};save();S.results.push({id:q.id,ok});
+  render();
+  const v2=document.querySelector(".verdict");if(v2)v2.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+function next(){if(S.i+1<S.list.length){S.i++;S.picked=null;render();window.scrollTo(0,0)}else{S.view="end";render();window.scrollTo(0,0)}}
+
+app.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+  if(a==="home"){S.view="home";render();window.scrollTo(0,0)}
+  else if(a==="field"){start(Q.filter(q=>q.c===b.dataset.c).map(q=>q.id),FIELDS[b.dataset.c].name)}
+  else if(a==="all"){start(shuffle(Q.map(q=>q.id)),"全問シャッフル")}
+  else if(a==="wrong"){const w=wrongIds();if(w.length)start(w,"まちがえた問題")}
+  else if(a==="retry"){start(S.results.filter(r=>!r.ok).map(r=>r.id),"やり直し")}
+  else if(a==="one"){start([b.dataset.id],"1問だけ")}
+  else if(a==="pick"){pick(b.dataset.v==="1")}
+  else if(a==="next"){next()}
+  else if(a==="reset"){
+    if(b.dataset.sure){store={res:{}};save();render()}
+    else{b.dataset.sure="1";b.textContent="本当に消す？（もう一度押す）"}
+  }
+});
+document.addEventListener("keydown",e=>{
+  if(S.view!=="quiz"||e.metaKey||e.ctrlKey||e.altKey)return;
+  const k=e.key.toLowerCase();
+  if(S.picked===null){if(k==="o"||k==="1")pick(true);else if(k==="x"||k==="2")pick(false)}
+  else if(k==="enter"||k==="n"||k===" "){if(document.activeElement&&document.activeElement.id!=="nextBtn"){e.preventDefault();next()}}
+});
+render();
+</script>
+<p class="offline" id="offline">オフライン利用：準備中…</p>
+<script>
+(function(){
+  var el=document.getElementById("offline");
+  function ok(){el.innerHTML="オフライン利用：<b>準備OK</b>（電波がなくても使えます）"}
+  if(!("serviceWorker" in navigator)){el.textContent="オフライン利用：この環境では使えません";return}
+  navigator.serviceWorker.register("sw.js").then(function(){return navigator.serviceWorker.ready}).then(function(){
+    return caches.open("takken-ox-v1").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v1").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+  .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
+})();
+</script>
+</body>
+</html>
