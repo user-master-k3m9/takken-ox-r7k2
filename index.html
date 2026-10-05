@@ -223,6 +223,18 @@ mark{background:linear-gradient(transparent 45%,var(--hl) 45%);color:inherit;pad
 .resitem .ghost{font-size:12px}
 .qtools{display:flex;justify-content:flex-end;gap:8px;margin-top:-10px}
 .qtools .ghost{font-size:12px;padding:4px 12px}
+
+.flead{margin:0 4px 10px;font-weight:700;font-size:15px;line-height:1.6}
+.fnote{margin:8px 4px 0;font-size:13px;color:var(--muted);line-height:1.6}
+.point::before{content:none}
+.point{flex-direction:column;gap:2px}
+.plbl{display:inline-block;font-size:11px;background:var(--maru);color:var(--card);border-radius:6px;padding:1px 8px;margin-bottom:4px;letter-spacing:.06em}
+.point > span{display:flex;flex-direction:column;align-items:flex-start}
+.ft td{text-align:left}
+.ft td:has(.y:only-child),.ft td:has(.n:only-child){text-align:center}
+.ft{font-size:13.5px}
+.ft th:not(:first-child),.ft td{min-width:5.2em}
+.ft tbody th.l{min-width:7em;max-width:14em}
 </style>
 </head>
 <body>
@@ -1825,6 +1837,182 @@ Object.assign(FIGS,{
     ["親（直系尊属）だけ","財産の1/3"],["それ以外（配偶者や子がいる）","財産の1/2"],["兄弟姉妹",`<span class="hit">なし</span>`]])}
 });
 
+/* 表の作り直し：どの表も「だれが・何を・どうする」を先に1文で書く（lead） */
+const tblL=(head,rows,note)=>tbl(head,rows)+(note?`<p class="fnote">${note}</p>`:"");
+Object.assign(FIGS,{
+  gyoTable:{lead:"土地や建物の取引を「くり返し、商売として」するとき、宅建業の免許がいるかどうか",
+    cap:"○＝免許がいる　×＝免許はいらない",
+    html:()=>tblL(["あなたの立場","売る・買う<br><small>（売買）</small>","とりかえる<br><small>（交換）</small>","貸す・借りる<br><small>（貸借）</small>"],[
+      ["自分が売主・貸主になる<br><small>（自ら）</small>",Y,Y,`${N}<br><small>大家さんは免許いらない</small>`],
+      ["人に頼まれて、その人の代わりに契約する<br><small>（代理）</small>",Y,Y,Y],
+      ["売りたい人と買いたい人をつなぐ<br><small>（媒介・なかだち）</small>",Y,Y,Y]])},
+  hosho:{lead:"宅建業者は、お客さんに損をさせたときのために、仕事を始める前にお金を預けておく",
+    cap:"保証協会に入れば、預けるお金はずっと少なくてすむ",
+    html:()=>tblL(["事務所","自分で供託所に預ける場合<br><small>（営業保証金）</small>","保証協会に入って納める場合<br><small>（弁済業務保証金分担金）</small>"],[
+      ["本店（主たる事務所）","1,000万円","60万円"],["支店（1か所ごとに）","500万円","30万円"]],
+      "例：本店1つ・支店2つなら、自分で預けると 1,000＋500×2＝2,000万円、保証協会なら 60＋30×2＝120万円")},
+  shakuchi:{lead:"土地や建物を借りている人は、借地借家法で特に強く守られている",
+    cap:"借地＝家を建てるために土地を借りる／借家＝建物を借りる",
+    html:()=>tblL(["くらべること","土地を借りる（借地）","建物を借りる（借家）"],[
+      ["何のために借りる？","自分の建物を建てるため","住む・お店や事務所にする"],
+      ["契約の期間","30年以上<br><small>短く決めても30年になる</small>","自由に決められる<br><small>1年未満と決めたら「期間なし」の扱い</small>"],
+      ["持ち主が変わっても<br>「借りています」と言える条件",`<span class="hit">土地の上の自分の建物を、自分の名前で登記している</span>`,`<span class="hit">カギを受け取って住んでいる（引渡し）</span>`]])},
+  kaihatsu:{lead:"土地を造成する（開発する）人は、この広さ以上なら、知事などの許可を受けなければならない",
+    cap:"これより小さければ、原則として許可はいらない",
+    html:()=>tblL(["開発する場所","許可がいる広さ"],[
+      ["市街化区域（街をつくる所）","1,000㎡以上"],[`<span class="hit">市街化調整区域（街をおさえる所）</span>`,`<span class="hit">広さに関係なく、すべて</span>`],
+      ["線引きしていない都市計画区域・準都市計画区域","3,000㎡以上"],["都市計画区域の外","10,000㎡（1ha）以上"]])},
+  nouchi:{lead:"農地を売ったり、宅地に変えたりする人は、農地法の許可を受けなければならない",
+    cap:"「何をするか」で、何条の許可か・だれの許可かが決まる",
+    html:()=>tblL(["あなたがすること","何条？","だれの許可？","市街化区域の中なら"],[
+      ["農地を、農地のまま人に売る・貸す","3条","農業委員会","同じく許可が必要"],
+      ["自分の農地を、宅地や駐車場に変える","4条","都道府県知事など",`<span class="hit">先に農業委員会へ届け出ればよい</span>`],
+      ["宅地などに変えるために、農地を人に売る・貸す","5条","都道府県知事など",`<span class="hit">先に農業委員会へ届け出ればよい</span>`]])},
+  kokudo:{lead:"大きな土地を買った人は、契約から2週間以内に、市町村長を通して知事に届け出る",
+    cap:"届け出るのは「買った人」。売った人ではない",
+    html:()=>tblL(["買った土地の場所","この広さ以上なら届出がいる"],[
+      ["市街化区域","2,000㎡"],["それ以外の都市計画区域（市街化調整区域など）","5,000㎡"],["都市計画区域の外","10,000㎡"]],
+      "届出がいらない例：相続でもらった・タダでもらった（贈与）・相手が国や市町村")},
+  zei:{lead:"不動産にかかる税金は、どこに納めるかが決まっている",
+    cap:"「国の税」か「地方の税」かがよく出る",
+    html:()=>tblL(["税金の名前","どんなときにかかる？","どこに納める？"],[
+      ["不動産取得税","土地や家を手に入れたとき（1回）","都道府県"],["固定資産税","土地や家を持っている間（毎年）","市町村"],
+      ["登録免許税","登記をするとき","国"],["印紙税","契約書などを作ったとき","国"]])},
+  haigyo:{lead:"宅建業をやめるときは、決まった人が、30日以内に免許をくれた所へ届け出る",
+    cap:"本人が届けられないときは、代わりの人が届ける",
+    html:()=>tblL(["宅建業をやめる理由","届け出る人","30日をいつから数える？"],[
+      ["個人の業者が亡くなった","相続人",`<span class="hit">亡くなったことを知った日</span>`],["会社が合併で消えた","消えた会社の代表者だった人","合併の日"],
+      ["破産した","破産管財人","破産の日"],["会社を解散した（合併・破産以外）","清算人","解散の日"],["自分から宅建業をやめた","本人（会社なら代表者）","やめた日"]])},
+  hoshoK:{lead:"宅建業者は、預けたお金が足りなくなったら、決まった期限までに補わなければならない",
+    cap:"基本は「2週間」。保証協会をやめたときだけ「1週間」",
+    html:()=>tblL(["こんなとき","宅建業者がすること"],[
+      ["お客さんへの支払いで、営業保証金が足りなくなった","通知から2週間以内に、足りない分を供託所へ"],
+      ["保証協会に入っていて、支店を新しく作った","作った日から2週間以内に、30万円を保証協会へ"],
+      ["保証協会から「足りない分を納めて」と通知された","通知から2週間以内に、保証協会へ"],
+      [`<span class="hit">保証協会をやめた</span>`,`<span class="hit">1週間以内に、営業保証金を供託所へ</span>`]])},
+  baikai:{lead:"家を売りたい人が、不動産屋さんに「買う人を探して」と頼む契約（媒介契約）は3種類",
+    cap:"依頼者のしばりが強い契約ほど、不動産屋さんの義務も重い",
+    html:()=>tblL(["くらべること","一般媒介","専任媒介","専属専任媒介"],[
+      ["依頼者は、ほかの不動産屋さんにも頼める？",Y,N,N],["依頼者は、自分で見つけた買主と契約できる？",Y,Y,N],
+      ["契約の期間","決まりなし","3か月まで","3か月まで"],
+      ["不動産屋さんが依頼者に様子を報告する回数","決まりなし","2週間に1回以上",`<span class="hit">1週間に1回以上</span>`],
+      ["不動産屋さんがレインズに登録する期限","義務なし","7日以内",`<span class="hit">5日以内</span>`],
+      ["不動産屋さんが契約書面を依頼者に渡す（売買・交換）","必要","必要","必要"]],"レインズ＝不動産屋さんどうしで物件情報を共有するネットワーク。登録の日数には、不動産屋さんの休業日を数えない")},
+  hozen:{lead:"業者が売主のとき、次の額をこえる手付金などを受け取るなら、受け取る前に保全措置（銀行の保証など）をする",
+    cap:"業者がつぶれても、買主のお金が戻るようにするため",
+    html:()=>tblL(["売る物件","代金に対する割合","または金額"],[
+      ["まだ完成していない（工事中）",`<span class="hit">5%</span>をこえる`,"1,000万円をこえる"],["もう完成している",`<span class="hit">10%</span>をこえる`,"1,000万円をこえる"]],
+      "保全措置がいらないとき：①受け取る額がこれ以下　②買主がもう所有権の登記をした")},
+  youto:{lead:"用途地域ごとに、建ててよい建物が決まっている（代表的なものだけ）",
+    cap:"○＝建てられる　×＝建てられない",
+    html:()=>tblL(["建てたい建物","低層住居専用地域<br><small>（静かな住宅地）</small>","その他の住居系地域","商業系地域","工業地域","工業専用地域"],[
+      ["神社・お寺、保育所、診療所、公衆浴場",Y,Y,Y,Y,Y],[`<span class="hit">病院</span>（ベッド20床以上）`,N,Y,Y,N,N],["小・中学校、高校",Y,Y,Y,N,N],
+      ["大学",N,Y,Y,N,N],["住宅",Y,Y,Y,Y,N]],"「低層住居専用地域」の列は、田園住居地域もほぼ同じ（病院・大学は×）。準工業地域は表にのせていない")},
+  hasshu:{lead:"宅建業者が売主、宅建業者でない人が買主のときだけ、業者に8つのルール（8種制限）がかかる",
+    cap:"業者どうしの取引や、業者が買主・なかだちのときは、かからない",
+    html:()=>`<div class="goro8">${GORO8}</div>`+tblL(["覚え方","ルールの名前","業者がしてはいけない・しなければならないこと"],[
+      ["菓子","契約不適合責任の特約の制限","民法より買主に不利な約束をしてはいけない（通知期間を「引渡しから2年以上」とする約束だけはOK）"],
+      ["割れた","割賦販売（分割払い）の解除の制限","支払いが遅れても、30日以上の期間を決めて書面で催促しないと、解除や残りの一括請求をしてはいけない"],
+      ["栗","クーリング・オフ","事務所など以外で申し込んだ買主から、書面で告げた日から8日以内に書面で解除されたら、全額返さなければならない"],
+      ["他人","他人の物件の売買の制限","まだ自分のものでない物件を売る契約を、原則してはいけない"],
+      ["所","所有権留保の禁止","分割払いで代金の30%をこえて受け取ったら、登記などを買主に移さなければならない"],
+      ["手を","手付の額の制限","代金の20%をこえる手付を受け取ってはいけない。手付は必ず解約手付になる"],
+      ["付けて","手付金等の保全措置","一定の額（未完成5%・完成10%・1,000万円）をこえて受け取るなら、先に保全措置をしなければならない"],
+      ["損した","損害賠償の予定の制限","損害賠償の予定と違約金を、合わせて代金の20%をこえて決めてはいけない"]])},
+  ishi:{lead:"だまされたり、勘違いしたりして結んだ契約は、どうなる？",
+    cap:"「本人にどれだけ落ち度があるか」で、後から買った第三者が守られるかが変わる",
+    html:()=>tblL(["契約したときの事情","その契約は","後から買った第三者に「返して」と言える？"],[
+      ["本心でないと分かっていて言った（心裡留保）","原則有効（相手が見ぬけたら無効）","第三者が事情を知らなければ、言えない"],
+      ["2人でしめし合わせてウソの契約をした（虚偽表示）","無効","第三者が事情を知らなければ、言えない（落ち度があっても）"],
+      ["大事なことを勘違いした（錯誤）","取り消せる（ひどい不注意があれば原則ダメ）","第三者が事情を知らず、落ち度もなければ、言えない"],
+      ["だまされた（詐欺）","取り消せる","第三者が事情を知らず、落ち度もなければ、言えない"],
+      [`<span class="hit">おどされた（強迫）</span>`,"取り消せる",`<span class="hit">どんな第三者にも言える</span>`]])},
+  jiko:{lead:"権利は、決まった期間がたつと、手に入ったり、なくなったりする（時効）",
+    cap:"「知った時から」と「できる時から」の2本立てが多い",
+    html:()=>tblL(["どんな時効？","期間"],[
+      ["他人の土地を、自分のものと信じて落ち度なく使い続けた → 自分のものになる","10年"],
+      ["他人の土地と知りながら使い続けた → 自分のものになる","20年"],
+      ["お金を返してもらう権利を使わない → なくなる","知った時から5年／使える時から10年"],
+      ["けがなどの損害賠償を請求しない → なくなる","知った時から3年（命・体は5年）／その時から20年"]])},
+  seigen:{lead:"判断する力が弱い人がひとりで結んだ契約は、あとで取り消せることがある",
+    cap:"判断する力が弱い人ほど、強く守られる",
+    html:()=>tblL(["どんな人？","ひとりで結んだ契約は？"],[
+      ["未成年者（18歳未満）","親の同意がなければ取り消せる（おこづかいの範囲などは別）"],
+      ["成年被後見人（判断する力がほとんどない人）",`<span class="hit">同意があっても取り消せる</span>（日用品の買い物は別）`],
+      ["被保佐人（判断する力がかなり弱い人）","土地の売買など大事な契約は、保佐人の同意がなければ取り消せる"],
+      ["被補助人（判断する力が少し弱い人）","家庭裁判所が決めた契約だけ、補助人の同意がいる"]])},
+  kyoyu:{lead:"何人かで持っている物（共有物）について何かするとき、何人の賛成がいる？",
+    cap:"することが重いほど、たくさんの賛成がいる",
+    html:()=>tblL(["すること","例","必要な賛成"],[
+      ["守る（保存）","雨もりを直す","ひとりでできる"],["使い方を決める（管理）","短い期間だけ人に貸す","持分の合計が半分をこえる人たち"],
+      ["大きく変える（変更）","全体を売る・建て替える",`<span class="hit">全員</span>`]])},
+  kigen:{lead:"宅建業者がしなければならないことには、期限が決まっている",
+    cap:"「30日」「2週間」「1週間」を区別する",
+    html:()=>tblL(["こんなとき","宅建業者がすること・期限"],[
+      ["会社の名前・役員・専任の宅建士などが変わった","30日以内に届け出る"],["宅建業をやめた（死亡・合併・破産など）","30日以内に届け出る"],
+      ["案内所で仕事を始める","始める10日前までに届け出る"],["免許を更新する","切れる90日前〜30日前に申請する"],
+      ["預けたお金（営業保証金など）が足りなくなった","2週間以内に補う"],["保証協会の会員が支店を作った","2週間以内に30万円を納める"],
+      [`<span class="hit">保証協会をやめた</span>`,`<span class="hit">1週間以内に営業保証金を預ける</span>`],
+      ["専任媒介／専属専任媒介を頼まれた","報告は2週間に1回／1週間に1回以上"],["専任媒介／専属専任媒介を頼まれた","レインズ登録は7日以内／5日以内"]])},
+  t3537:{lead:"宅建業者は、契約の「前」に重要事項を説明し、契約の「後」に契約内容の書面を渡す",
+    cap:"35条は「前」、37条は「後」",
+    html:()=>tblL(["くらべること","重要事項の説明（35条書面）","契約内容の書面（37条書面）"],[
+      ["いつ？","契約が成立する前","契約が成立した後、すぐに"],["だれに？","買う人・借りる人（売る人・貸す人には不要）","契約した両方の人"],
+      ["宅建士が口で説明する？","する（相手が宅建業者なら書面を渡すだけ）","しない"],["宅建士が名前を書く（記名）？","書く","書く"],
+      ["代金の額を書く？","書かない（代金「以外」のお金は書く）","必ず書く"],["紙でなく電子データで渡せる？","相手がOKすれば渡せる","相手がOKすれば渡せる"]])},
+  boka:{lead:"火事が広がりやすい場所では、建物を火に強い作り（耐火建築物など）にしなければならない",
+    cap:"防火地域のほうが厳しい",
+    html:()=>tblL(["場所","耐火建築物などにしなければならない建物"],[
+      ["防火地域（駅前・大通りぞいなど）","3階以上、または延べ面積が100㎡をこえる"],["準防火地域（その周り）","4階以上、または延べ面積が1,500㎡をこえる"]])},
+  menzei:{lead:"税金の計算のもとになる額（課税標準）が、次の額より少なければ、税金はかからない（免税点）",
+    cap:"不動産取得税と固定資産税で金額がちがう",
+    html:()=>tblL(["税金","土地","家"],[
+      ["不動産取得税","10万円","建てた家：23万円<br>買った家など：12万円"],["固定資産税","30万円","20万円"]])},
+  chika:{lead:"土地の値段の目安は、国と都道府県が、毎年それぞれ発表している",
+    cap:"名前・時点・発表する人をセットで",
+    html:()=>tblL(["くらべること","地価公示","都道府県地価調査"],[
+      ["いつの時点の値段？","毎年1月1日","毎年7月1日"],["発表するのは？","土地鑑定委員会（国）","都道府県知事"],
+      ["どの土地？","標準地","基準地"],["何人の不動産鑑定士が調べる？","2人以上","1人以上"]])},
+  kantei:{lead:"不動産鑑定士は、3つの方法を組み合わせて、不動産の値段を決める",
+    cap:"どれか1つではなく、組み合わせて使う",
+    html:()=>tblL(["方法","どうやって値段を出す？"],[
+      ["原価法","いま同じ物を作ったらいくらかかるかを考え、古くなった分を引く"],
+      ["取引事例比較法","近くの似た物件が、いくらで売れたかとくらべる"],
+      ["収益還元法","その物件が、これからいくらお金を生むか（家賃など）から計算する。自分で使っている物件にも使える"]])},
+  kekkaku:{lead:"次の人は、宅建業の免許を受けられない（欠格事由）",
+    cap:"多くは「5年」待てば受けられる",
+    html:()=>tblL(["こんな人","いつから免許を受けられる？"],[
+      ["拘禁刑以上の刑を受けた（罪の種類は問わない）","刑が終わってから5年後"],["宅建業法違反・暴力的な罪・背任で罰金刑を受けた","刑が終わってから5年後"],
+      ["ズルをして免許を取り、取り消された","取り消されてから5年後"],["暴力団員（やめても5年たっていない人を含む）","やめてから5年後"],
+      ["破産して、まだ立ち直っていない（復権していない）","復権すればすぐ"],
+      [`<span class="hit">執行猶予がついた</span>`,`<span class="hit">猶予の期間が無事に終われば、すぐ</span>`]])},
+  iryu:{lead:"遺言の内容にかかわらず、家族は財産の一定の割合をもらえる（遺留分）",
+    cap:"兄弟姉妹には遺留分がない",
+    html:()=>tblL(["相続する人","遺留分（全員分の合計）"],[
+      ["親だけ","財産の1/3"],["配偶者や子がいる","財産の1/2"],["兄弟姉妹",`<span class="hit">なし</span>`]])}
+});
+/* 図（イラスト）にも「何を表すか」の1文を付ける */
+const LEADS={menkyo:"宅建業の免許は、事務所がある都道府県の数で、くれる人が変わる",
+  tl:"宅建業者は、契約の「前」に説明し、契約の「後」に書面を渡す",
+  cooling:"喫茶店などで申し込んだ買主は、8日以内なら書面でやめられる",
+  tetsuke:"業者が売主のとき、手付金は代金の2割までしか受け取れない",
+  hoshu:"不動産屋さんが売買のなかだちで受け取れる手数料には上限がある",
+  sagi:"だまされた人・おどされた人は、後から買った第三者に「返して」と言える？",
+  nijuu:"1つの土地を2人に売ったら、先に登記をした人のものになる",
+  dairi:"代理人が結んだ契約は、本人が結んだことになる",
+  teitou:"お金を借りた人は、家に抵当権をつけても住み続けられる",
+  souzoku:"亡くなった人の財産は、法律で決まった割合で家族が受けつぐ",
+  toshi:"都市計画区域の中を、「街をつくる所」と「街をおさえる所」に分ける",
+  kenpei:"敷地の広さに対して、建てられる建物の大きさが決まっている",
+  setsudo:"建物を建てる土地は、幅4m以上の道路に2m以上接していなければならない",
+  toho:"広告の「駅から徒歩○分」は、80mを1分として計算する",
+  dorosha:"幅4m未満の古い道に面した土地は、道の中心から2m下がった所までしか使えない",
+  kanchi:"区画整理の工事中は、もとの土地の代わりに仮の土地（仮換地）を使う"};
+for(const k in LEADS)if(FIGS[k]&&!FIGS[k].lead)FIGS[k].lead=LEADS[k];
+(function(){const old=FIGS.souzoku.html;FIGS.souzoku.lead="亡くなった人の財産は、だれと一緒に相続するかで、配偶者の取り分が変わる";
+FIGS.souzoku.html=()=>old().replace(/<table[\s\S]*<\/table>/,tblL(["一緒に相続する人","配偶者（夫・妻）の取り分","相手の取り分（全員分）"],[
+  ["子ども","1/2","1/2"],["親（子どもがいないとき）","2/3","1/3"],["兄弟姉妹（子どもも親もいないとき）","3/4","1/4"]],"同じ立場の人が何人かいるときは、その取り分を人数で等しく分ける"))})();
+
 /* 覚え方とまとめ表を、内容に合う問題に付ける（磨き上げ） */
 (function(){
   const G=(t,g,n)=>({t,g,n});
@@ -1909,6 +2097,7 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}};
 /* 途中の状態（どこまで解いたか）を、セットごとに保存する */
 function saveSes(){if(!S.key)return;store.ses[S.key]={list:S.list,i:S.i,picked:S.picked,results:S.results,label:S.label,from:S.from,ts:Date.now()};save()}
 function dropSes(key){if(key&&store.ses[key]){delete store.ses[key];save()}}
+const nextNo=v=>v.i+1+(v.picked!==null&&v.i+1<v.list.length?1:0);
 const validSes=k=>{const v=store.ses[k];return v&&Array.isArray(v.list)&&v.list.length&&v.list.every(id=>Q.some(q=>q.id===id))&&v.i<v.list.length};
 
 /* ---------- 画面 ---------- */
@@ -1935,7 +2124,7 @@ function home(){
   </section>
   ${(()=>{const ks=Object.keys(store.ses).filter(validSes).sort((a,b)=>store.ses[b].ts-store.ses[a].ts);if(!ks.length)return"";
     return `<section class="resume"><h2>続きから解く</h2>${ks.map(k=>{const v=store.ses[k];const pos=v.i+(v.picked!==null?1:0);return `
-      <div class="resitem" style="--fc:${keyColor(k)}"><span class="t">${keyName(k)}<small>${v.list.length}問中 ${pos}問 解答ずみ</small></span>
+      <div class="resitem" style="--fc:${keyColor(k)}"><span class="t">${keyName(k)}<small>全${v.list.length}問のうち${pos}問を解答ずみ。次は${nextNo(v)}問目から</small></span>
       <button class="btn" data-act="resume" data-k="${k}">続きから</button><button class="ghost" data-act="drop" data-k="${k}" aria-label="${keyName(k)}の途中の記録を消す">やめる</button></div>`}).join("")}</section>`})()}
   <div class="steps" aria-label="おすすめの進め方">
     ${[1,2,3].map(l=>`<div class="step"><span class="lvdot l${l}">${l}</span><div><b>${LV[l].name}</b><small>${LV[l].sub}</small></div></div>`).join('<span class="arrow" aria-hidden="true">→</span>')}
@@ -1947,7 +2136,7 @@ function home(){
       <div class="lvls">${[1,2,3].map(l=>{const ls=stat(setOf(k,l));const full=ls.ok===ls.n&&ls.n>0;return `
         <button class="lvbtn" data-act="lv" data-c="${k}" data-lv="${l}">
           <span class="lvdot l${l}">${l}</span><span class="nm">${LV[l].name}<small>${ls.n}問</small></span>
-          <span class="sc">${validSes(k+":"+l)?`<b class="done">続き ${store.ses[k+":"+l].i+1}問目</b>`:full?'<b class="done">クリア</b>':ls.done?`${ls.ok}/${ls.n}`:"まだ"}</span></button>`}).join("")}</div>
+          <span class="sc">${validSes(k+":"+l)?`<b class="done">続きは${nextNo(store.ses[k+":"+l])}問目から</b>`:full?'<b class="done">クリア</b>':ls.done?`${ls.ok}/${ls.n}`:"まだ"}</span></button>`}).join("")}</div>
     </section>`}).join("")}</div>
   <div class="row">
     <button class="btn" data-act="mock">本番の配分で50問</button>
@@ -1971,7 +2160,10 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor
 function start(ids,label,from,key){S={view:"quiz",list:ids,i:0,picked:null,results:[],label,from:from||null,key:key||null};saveSes();render();window.scrollTo(0,0)}
 /* 保存があれば続きから、なければ最初から */
 function resumeOr(key,make,label,from){
-  if(validSes(key)){const v=store.ses[key];S={view:"quiz",list:v.list,i:v.i,picked:v.picked,results:v.results||[],label:v.label,from:v.from||null,key};render();window.scrollTo(0,0)}
+  if(validSes(key)){const v=store.ses[key];let i=v.i,picked=v.picked;
+    /* 答えた問題で止まっていたら、次のまだ解いていない問題から */
+    if(picked!==null&&i+1<v.list.length){i++;picked=null}
+    S={view:"quiz",list:v.list,i,picked,results:v.results||[],label:v.label,from:v.from||null,key};saveSes();render();window.scrollTo(0,0)}
   else start(make(),label,from,key);
 }
 function restart(){const k=S.key;dropSes(k);const make=MAKERS[k]?MAKERS[k]:()=>S.list;const lbl=S.label,fr=S.from;start(make(),lbl,fr,k)}
@@ -1997,9 +2189,9 @@ function quiz(){
   const fig=q.fig&&FIGS[q.fig];
   out+=`<div class="verdict ${ok?"ok":"ng"}" role="status"><span class="big">${ok?"○":"×"}</span><div><h3>${ok?"正解！":"ざんねん"}</h3><p>この文は「<b>${q.a?"○ 正しい":"× まちがい"}</b>」です</p></div></div>
     <div class="exp">
-      <div><h4>かんたん解説</h4><div class="body">${q.exp}</div></div>
-      ${fig?`<figure class="fig" style="margin:0">${fig.html()}<figcaption class="cap">${fig.cap}</figcaption></figure>`:""}
-      <div class="point">${q.pt}</div>
+      <div class="point"><span><span class="plbl">ここがポイント</span>${q.pt}</span></div>
+      <div><h4>くわしい解説</h4><div class="body">${q.exp}</div></div>
+      ${fig?`<figure class="fig" style="margin:0">${fig.lead?`<p class="flead">${fig.lead}</p>`:""}${fig.html()}<figcaption class="cap">${fig.cap}</figcaption></figure>`:""}
       ${q.goro?`<div class="goro"><span class="lbl">${q.goro.t}</span><span class="g">${q.goro.g}</span>${q.goro.n?`<br><small>${q.goro.n}</small>`:""}</div>`:""}
       <div class="hon"><span class="lbl">本番の試験では、こんな書き方で出ます</span>「${q.hon.replace(/（→ 誤り）$/,"")}」<br><b>→ ${/（→ 誤り）$/.test(q.hon)?"誤り":"正しい"}</b></div>
       ${q.w?`<div><h4>ことばメモ</h4><dl class="words">${q.w.map(w=>`<div><dt><ruby>${w[0]}<rt>${w[1]}</rt></ruby></dt><dd>${w[2]}</dd></div>`).join("")}</dl></div>`:""}
@@ -2064,15 +2256,19 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
+<p class="offline">第4版（2026年10月5日更新）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
   var el=document.getElementById("offline");
   function ok(){el.innerHTML="オフライン利用：<b>準備OK</b>（電波がなくても使えます）"}
   if(!("serviceWorker" in navigator)){el.textContent="オフライン利用：この環境では使えません";return}
-  navigator.serviceWorker.register("sw.js").then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v3").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v3").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+  // 新しい版が入ったら、1回だけ自動で読み直す（解きかけの記録は保存済みなので消えない）
+  var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
+  navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
+  navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
+    return caches.open("takken-ox-v4").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v4").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
