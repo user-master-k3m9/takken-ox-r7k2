@@ -3519,6 +3519,112 @@ const MyNote = (() => {
   };
 })();
 
+/* ---------- 問題の移動バーと問題一覧：3つの学習アプリで共通の部品 ----------
+   問題画面の進み具合のバー（.qhead のすぐ後ろの .meter）を、指でなぞって問題を移動できるようにする。
+   バーを長押し、または「一覧」ボタンで、問題の一覧（○×・まだ）を開き、タップでその問題へ移動する。
+   QNav.init({ state: () => ({ n, cur, status: ["ok"|"ng"|"", ...], text: k => "問題文" }) | null, jump: k => {...} })
+   state は問題画面のときだけ値を返す（それ以外は null）。画面の描き直しは MutationObserver で検出する。 */
+const QNav = (() => {
+  let OPT = null, sheet = null;
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const plain = s => String(s || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  const css = `
+.qn-wrap{position:relative;padding:10px 0;margin:-10px 0;touch-action:pan-y}
+.qn-wrap .meter{position:relative}
+.qn-range{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);width:100%;height:34px;margin:0;opacity:0;cursor:pointer;-webkit-appearance:none;appearance:none}
+.qn-knob{position:absolute;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:var(--card,#fff);border:3px solid var(--acc,#1f6b5c);box-shadow:0 1px 3px rgba(0,0,0,.25);pointer-events:none}
+.qn-tip{position:absolute;bottom:100%;transform:translateX(-50%);margin-bottom:6px;background:var(--ink,#222);color:var(--card,#fff);font-size:12px;line-height:1.4;border-radius:8px;padding:4px 8px;white-space:nowrap;max-width:70vw;overflow:hidden;text-overflow:ellipsis;pointer-events:none;display:none;z-index:5}
+.qn-wrap.drag .qn-tip{display:block}
+.qn-btn{border:1px solid var(--line,#ccc);background:var(--card,#fff);color:var(--ink,#222);border-radius:8px;padding:2px 8px;font-size:12px;font-weight:700;cursor:pointer;line-height:1.6}
+.qn-sheet{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.qn-panel{background:var(--card,#fff);color:var(--ink,#222);width:100%;max-width:640px;max-height:82vh;border-radius:16px 16px 0 0;display:flex;flex-direction:column;box-shadow:0 -4px 20px rgba(0,0,0,.2)}
+.qn-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line,#ddd)}
+.qn-head b{font-size:16px}
+.qn-head small{color:var(--muted,#666);font-size:12px;display:block}
+.qn-close{border:0;background:transparent;font-size:24px;line-height:1;cursor:pointer;color:var(--muted,#666);padding:4px 8px}
+.qn-list{overflow:auto;-webkit-overflow-scrolling:touch;padding:6px 8px 16px}
+.qn-item{display:grid;grid-template-columns:44px 28px 1fr;align-items:center;gap:6px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line,#eee);background:transparent;color:inherit;padding:10px 8px;font-size:14px;line-height:1.5;cursor:pointer}
+.qn-item:hover{background:var(--paper,#f6f6f6)}
+.qn-item.cur{background:var(--acc-soft,#e1efeb);border-radius:8px}
+.qn-item .no{font-weight:700;color:var(--muted,#666);font-variant-numeric:tabular-nums}
+.qn-item .st{font-weight:900;font-size:16px;text-align:center}
+.qn-item .st.ok{color:var(--maru,#cf3b2a)}
+.qn-item .st.ng{color:var(--batsu,#46566a)}
+.qn-item .st.no{color:var(--line,#bbb)}
+.qn-item .tx{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.qn-legend{display:flex;gap:12px;font-size:12px;color:var(--muted,#666);padding:6px 16px 0}`;
+
+  function status() { try { return OPT && OPT.state(); } catch (e) { return null; } }
+  /* バーの背景を、1問ずつ ○（赤）・×（灰青）・まだ（薄い色）で塗り分ける */
+  function paint(meter, st) {
+    const n = st.n, seg = [];
+    for (let k = 0; k < n; k++) {
+      const c = st.status[k] === "ok" ? "var(--maru,#cf3b2a)" : st.status[k] === "ng" ? "var(--batsu,#46566a)" : "transparent";
+      seg.push(`${c} ${(k / n * 100).toFixed(3)}% ${((k + 1) / n * 100).toFixed(3)}%`);
+    }
+    const i = meter.querySelector("i"); if (i) i.style.opacity = ".35";
+    meter.style.backgroundImage = `linear-gradient(90deg,${seg.join(",")})`;
+  }
+  function place(wrap, st, k) {
+    const pos = st.n > 1 ? k / (st.n - 1) * 100 : 50;
+    const kn = wrap.querySelector(".qn-knob"), tip = wrap.querySelector(".qn-tip");
+    kn.style.left = pos + "%"; tip.style.left = Math.min(85, Math.max(15, pos)) + "%";
+    tip.textContent = `${k + 1} / ${st.n}　${plain(st.text(k)).slice(0, 28)}`;
+  }
+
+  function enhance() {
+    const st = status(); if (!st || !st.n) return;
+    const head = document.querySelector(".qhead"); if (!head) return;
+    const meter = head.nextElementSibling; if (!meter || !meter.classList.contains("meter") || meter.dataset.qn) return;
+    meter.dataset.qn = "1";
+    const wrap = document.createElement("div"); wrap.className = "qn-wrap";
+    meter.parentNode.insertBefore(wrap, meter); wrap.appendChild(meter);
+    wrap.insertAdjacentHTML("beforeend", `<span class="qn-knob" aria-hidden="true"></span><span class="qn-tip" aria-hidden="true"></span><input class="qn-range" type="range" min="1" max="${st.n}" step="1" value="${st.cur + 1}" aria-label="問題を移動（左右にずらす。長押しで一覧）">`);
+    paint(meter, st); place(wrap, st, st.cur);
+    if (!head.querySelector(".qn-btn")) head.insertAdjacentHTML("beforeend", `<button type="button" class="qn-btn" aria-label="問題の一覧を開く">一覧</button>`);
+    head.querySelector(".qn-btn").addEventListener("click", open);
+    const r = wrap.querySelector(".qn-range");
+    let timer = null, moved = false, startX = 0;
+    r.addEventListener("pointerdown", e => { moved = false; startX = e.clientX; clearTimeout(timer); timer = setTimeout(() => { if (!moved) { wrap.classList.remove("drag"); r.value = st.cur + 1; place(wrap, st, st.cur); open(); } }, 550); });
+    r.addEventListener("pointermove", e => { if (Math.abs(e.clientX - startX) > 6) { moved = true; clearTimeout(timer); } });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(t => r.addEventListener(t, () => clearTimeout(timer)));
+    /* 長押しで出るメニュー（iPhone）を出さない */
+    r.addEventListener("contextmenu", e => { e.preventDefault(); clearTimeout(timer); open(); });
+    r.addEventListener("input", () => { moved = true; clearTimeout(timer); wrap.classList.add("drag"); place(wrap, st, +r.value - 1); });
+    r.addEventListener("change", () => { wrap.classList.remove("drag"); const k = +r.value - 1; if (k !== st.cur) OPT.jump(k); });
+    /* キー操作が答えのキー（1〜4 など）に化けないようにする */
+    r.addEventListener("keydown", e => e.stopPropagation());
+  }
+
+  function close() { if (sheet) { sheet.remove(); sheet = null; document.body.style.overflow = ""; } }
+  function open() {
+    const st = status(); if (!st) return; close();
+    const ok = st.status.filter(s => s === "ok").length, ng = st.status.filter(s => s === "ng").length;
+    sheet = document.createElement("div"); sheet.className = "qn-sheet"; sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-label", "問題の一覧");
+    sheet.innerHTML = `<div class="qn-panel"><div class="qn-head"><div><b>問題の一覧（全${st.n}問）</b><small>正解 ${ok}・まちがい ${ng}・まだ ${st.n - ok - ng}　タップでその問題へ</small></div><button type="button" class="qn-close" aria-label="閉じる">×</button></div>
+      <div class="qn-legend"><span><b style="color:var(--maru,#cf3b2a)">○</b> 正解</span><span><b style="color:var(--batsu,#46566a)">×</b> まちがい</span><span><b style="color:var(--line,#bbb)">－</b> まだ</span></div>
+      <div class="qn-list">${Array.from({ length: st.n }, (_, k) => `<button type="button" class="qn-item ${k === st.cur ? "cur" : ""}" data-k="${k}"><span class="no">${k + 1}</span><span class="st ${st.status[k] || "no"}">${st.status[k] === "ok" ? "○" : st.status[k] === "ng" ? "×" : "－"}</span><span class="tx">${esc(plain(st.text(k)).slice(0, 80))}</span></button>`).join("")}</div></div>`;
+    sheet.addEventListener("click", e => {
+      if (e.target === sheet || e.target.closest(".qn-close")) { close(); return; }
+      const b = e.target.closest(".qn-item"); if (b) { const k = +b.dataset.k; close(); if (k !== st.cur) OPT.jump(k); }
+    });
+    sheet.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Escape") close(); });
+    document.body.appendChild(sheet); document.body.style.overflow = "hidden";
+    const cur = sheet.querySelector(".qn-item.cur"); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "center" });
+    const c = sheet.querySelector(".qn-close"); if (c) c.focus();
+  }
+
+  return {
+    init(opt) {
+      OPT = opt;
+      const s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
+      new MutationObserver(() => enhance()).observe(document.body, { childList: true, subtree: true });
+      enhance();
+    },
+    open, close
+  };
+})();
+
 /* ---------- レベル・並び ---------- */
 const LV={1:{name:"基礎",sub:"ことばとしくみ"},2:{name:"標準",sub:"よく出るルール"},3:{name:"合格レベル",sub:"本番でまちがえやすい所"}};
 const ORDER=["gyo","ken","hou","zei"];
@@ -3566,6 +3672,11 @@ function estimate(){let s=0;ORDER.forEach(k=>{const st=stat(setOf(k));s+=st.n?st
 /* ---------- 画面 ---------- */
 const app=document.getElementById("app");
 MyNote.init("takken-ox-notes");
+/* 進み具合のバーで問題を移動・長押しで一覧（共通部品 qnav.js） */
+QNav.init({
+  state:()=>S.view==="quiz"?{n:S.list.length,cur:S.i,status:S.list.map((id,k)=>S.picks[k]===undefined||S.picks[k]===null?"":(S.picks[k]===QI[id].a?"ok":"ng")),text:k=>QI[S.list[k]].q}:null,
+  jump:k=>{S.i=k;S.picked=S.picks[k]!==undefined&&S.picks[k]!==null?S.picks[k]:null;saveSes();render();window.scrollTo(0,0)}
+});
 let S={view:"home",list:[],i:0,picked:null,picks:[],results:[],label:"",from:null,key:null};
 
 const header=()=>`<div class="top"><button class="brand" data-act="home" aria-label="ホームへ"><span class="seal">宅建</span><span><b>はじめての宅建○×</b><small>基礎から合格レベルまで</small></span></button>${S.view!=="home"?`<button class="ghost" data-act="home">ホーム</button>`:""}</div>`;
@@ -3864,7 +3975,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第7版（2026年10月6日更新：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第8版（2026年10月6日更新：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -3875,8 +3986,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v7").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v7").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v8").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v8").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
