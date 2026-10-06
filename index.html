@@ -3522,8 +3522,9 @@ const MyNote = (() => {
 /* ---------- 問題の移動バーと問題一覧：3つの学習アプリで共通の部品 ----------
    問題画面の進み具合のバー（.qhead のすぐ後ろの .meter）を、指でなぞって問題を移動できるようにする。
    バーを長押し、または「一覧」ボタンで、問題の一覧（○×・まだ）を開き、タップでその問題へ移動する。
-   QNav.init({ state: () => ({ n, cur, status: ["ok"|"ng"|"", ...], text: k => "問題文" }) | null, jump: k => {...} })
-   state は問題画面のときだけ値を返す（それ以外は null）。画面の描き直しは MutationObserver で検出する。 */
+   QNav.init({ state: () => ({ n, cur, status: ["ok"|"mid"|"ng"|"", ...], text: k => "問題文" }) | null, jump: k => {...}, mark: (k, g) => {...} })
+   state は問題画面のときだけ値を返す（それ以外は null）。画面の描き直しは MutationObserver で検出する。
+   mark を渡すと、一覧の各行に ○・△・× のボタンが出て、評価を付け直せる（復習の予定 srs.js に反映する）。 */
 const QNav = (() => {
   let OPT = null, sheet = null;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -3544,6 +3545,16 @@ const QNav = (() => {
 .qn-close{border:0;background:transparent;font-size:24px;line-height:1;cursor:pointer;color:var(--muted,#666);padding:4px 8px}
 .qn-list{overflow:auto;-webkit-overflow-scrolling:touch;padding:6px 8px 16px}
 .qn-item{display:grid;grid-template-columns:44px 28px 1fr;align-items:center;gap:6px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line,#eee);background:transparent;color:inherit;padding:10px 8px;font-size:14px;line-height:1.5;cursor:pointer}
+.qn-row{display:flex;align-items:center;border-bottom:1px solid var(--line,#eee)}
+.qn-row .qn-item{border-bottom:0;flex:1;min-width:0}
+.qn-row.cur{background:var(--acc-soft,#e1efeb);border-radius:8px}
+.qn-row.cur .qn-item{background:transparent}
+.qn-marks{display:flex;gap:4px;padding-right:6px;flex:none}
+.qn-mk{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line,#ccc);background:var(--card,#fff);font-size:16px;font-weight:900;line-height:1;cursor:pointer;color:var(--muted,#888);padding:0}
+.qn-mk.ok.on{background:var(--maru,#cf3b2a);border-color:var(--maru,#cf3b2a);color:#fff}
+.qn-mk.mid.on{background:var(--sankaku,#d08a12);border-color:var(--sankaku,#d08a12);color:#fff}
+.qn-mk.ng.on{background:var(--batsu,#46566a);border-color:var(--batsu,#46566a);color:#fff}
+.qn-item .st.mid{color:var(--sankaku,#d08a12)}
 .qn-item:hover{background:var(--paper,#f6f6f6)}
 .qn-item.cur{background:var(--acc-soft,#e1efeb);border-radius:8px}
 .qn-item .no{font-weight:700;color:var(--muted,#666);font-variant-numeric:tabular-nums}
@@ -3559,7 +3570,7 @@ const QNav = (() => {
   function paint(meter, st) {
     const n = st.n, seg = [];
     for (let k = 0; k < n; k++) {
-      const c = st.status[k] === "ok" ? "var(--maru,#cf3b2a)" : st.status[k] === "ng" ? "var(--batsu,#46566a)" : "transparent";
+      const c = st.status[k] === "ok" ? "var(--maru,#cf3b2a)" : st.status[k] === "ng" ? "var(--batsu,#46566a)" : st.status[k] === "mid" ? "var(--sankaku,#d08a12)" : "transparent";
       seg.push(`${c} ${(k / n * 100).toFixed(3)}% ${((k + 1) / n * 100).toFixed(3)}%`);
     }
     const i = meter.querySelector("i"); if (i) i.style.opacity = ".35";
@@ -3597,20 +3608,44 @@ const QNav = (() => {
   }
 
   function close() { if (sheet) { sheet.remove(); sheet = null; document.body.style.overflow = ""; } }
+  const SYM = { ok: "○", mid: "△", ng: "×" };
+  function listHtml(st) {
+    const cnt = g => st.status.filter(s => s === g).length;
+    const ok = cnt("ok"), mid = cnt("mid"), ng = cnt("ng"), canMark = !!OPT.mark;
+    const rows = Array.from({ length: st.n }, (_, k) => {
+      const s = st.status[k] || "";
+      const item = `<button type="button" class="qn-item ${!canMark && k === st.cur ? "cur" : ""}" data-k="${k}"><span class="no">${k + 1}</span><span class="st ${s || "no"}">${SYM[s] || "－"}</span><span class="tx">${esc(plain(st.text(k)).slice(0, 80))}</span></button>`;
+      if (!canMark) return item;
+      return `<div class="qn-row ${k === st.cur ? "cur" : ""}">${item}<span class="qn-marks" role="group" aria-label="${k + 1}問目の評価">${["ok", "mid", "ng"].map(g => `<button type="button" class="qn-mk ${g} ${s === g ? "on" : ""}" data-k="${k}" data-g="${g}" aria-pressed="${s === g}" aria-label="${k + 1}問目を${{ ok: "○（できた）", mid: "△（あいまい）", ng: "×（まちがい）" }[g]}にする">${SYM[g]}</button>`).join("")}</span></div>`;
+    }).join("");
+    return `<div class="qn-panel"><div class="qn-head"><div><b>問題の一覧（全${st.n}問）</b><small>○ ${ok}・△ ${mid}・× ${ng}・まだ ${st.n - ok - mid - ng}　${canMark ? "問題文をタップで移動、右の○△×で評価を変更" : "タップでその問題へ"}</small></div><button type="button" class="qn-close" aria-label="閉じる">×</button></div>
+      <div class="qn-legend"><span><b style="color:var(--maru,#cf3b2a)">○</b> できた</span><span><b style="color:var(--sankaku,#d08a12)">△</b> あいまい</span><span><b style="color:var(--batsu,#46566a)">×</b> まちがい</span><span><b style="color:var(--line,#bbb)">－</b> まだ</span></div>
+      ${canMark ? `<div class="qn-legend" style="padding-top:2px">評価に合わせて、ホームの「今日の復習」に出ます（×・△は明日。○は明日→3日後→1週間後→2週間後→1か月後と間隔をのばす）。</div>` : ""}
+      <div class="qn-list">${rows}</div></div>`;
+  }
   function open() {
     const st = status(); if (!st) return; close();
-    const ok = st.status.filter(s => s === "ok").length, ng = st.status.filter(s => s === "ng").length;
     sheet = document.createElement("div"); sheet.className = "qn-sheet"; sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-label", "問題の一覧");
-    sheet.innerHTML = `<div class="qn-panel"><div class="qn-head"><div><b>問題の一覧（全${st.n}問）</b><small>正解 ${ok}・まちがい ${ng}・まだ ${st.n - ok - ng}　タップでその問題へ</small></div><button type="button" class="qn-close" aria-label="閉じる">×</button></div>
-      <div class="qn-legend"><span><b style="color:var(--maru,#cf3b2a)">○</b> 正解</span><span><b style="color:var(--batsu,#46566a)">×</b> まちがい</span><span><b style="color:var(--line,#bbb)">－</b> まだ</span></div>
-      <div class="qn-list">${Array.from({ length: st.n }, (_, k) => `<button type="button" class="qn-item ${k === st.cur ? "cur" : ""}" data-k="${k}"><span class="no">${k + 1}</span><span class="st ${st.status[k] || "no"}">${st.status[k] === "ok" ? "○" : st.status[k] === "ng" ? "×" : "－"}</span><span class="tx">${esc(plain(st.text(k)).slice(0, 80))}</span></button>`).join("")}</div></div>`;
+    sheet.innerHTML = listHtml(st);
     sheet.addEventListener("click", e => {
       if (e.target === sheet || e.target.closest(".qn-close")) { close(); return; }
+      const m = e.target.closest(".qn-mk");
+      if (m) {
+        const k = +m.dataset.k, g = m.dataset.g;
+        OPT.mark(k, g);
+        /* 一覧を開いたまま、行の表示と見出しの数を更新する（スクロール位置は保つ） */
+        const ns = status(); if (!ns) return;
+        const list = sheet.querySelector(".qn-list"), top = list ? list.scrollTop : 0;
+        sheet.innerHTML = listHtml(ns);
+        const nl = sheet.querySelector(".qn-list"); if (nl) nl.scrollTop = top;
+        const b = sheet.querySelector(`.qn-mk[data-k="${k}"][data-g="${g}"]`); if (b) b.focus();
+        return;
+      }
       const b = e.target.closest(".qn-item"); if (b) { const k = +b.dataset.k; close(); if (k !== st.cur) OPT.jump(k); }
     });
     sheet.addEventListener("keydown", e => { e.stopPropagation(); if (e.key === "Escape") close(); });
     document.body.appendChild(sheet); document.body.style.overflow = "hidden";
-    const cur = sheet.querySelector(".qn-item.cur"); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "center" });
+    const cur = sheet.querySelector(".qn-row.cur, .qn-item.cur"); if (cur && cur.scrollIntoView) cur.scrollIntoView({ block: "center" });
     const c = sheet.querySelector(".qn-close"); if (c) c.focus();
   }
 
@@ -3622,6 +3657,69 @@ const QNav = (() => {
       enhance();
     },
     open, close
+  };
+})();
+
+/* ---------- 復習の予定（エビングハウスの忘却曲線）：3つの学習アプリで共通の部品 ----------
+   問題ごとに ○（できた）・△（あいまい）・×（まちがい）の評価を持ち、次に出す日を決める。
+   ○を重ねるほど間隔をのばす：翌日 → 3日後 → 1週間後 → 2週間後 → 1か月後 → 2か月後。
+   △と×は翌日にもう一度（×は最初の段階からやり直し、△は段階を進めない）。
+   同じ日に評価を付け直したときは、その日の最初の評価の前の段階から計算し直す（一覧で△に直したとき用）。
+   SRS.init(保存名) / SRS.set(id, "ok"|"mid"|"ng") / SRS.grade(id) / SRS.isDue(id) / SRS.dueIds(ids) / SRS.seed(id, ok) */
+const SRS = (() => {
+  const GAP = [1, 3, 7, 14, 30, 60];
+  let KEY = null, D = {};
+  const css = `
+.review{margin:14px 0;padding:14px 16px;border:2px solid var(--maru,#cf3b2a);border-radius:16px;background:var(--card,#fff)}
+.review .rvhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.review .rvhead b{font-size:18px}
+.review .rvhead small{color:var(--muted,#666);font-size:12px}
+.review .rvnum{margin:8px 0 10px;font-size:15px}
+.review .rvnum strong{font-size:26px;color:var(--maru,#cf3b2a);margin-right:2px}
+.review .rvnote{margin:10px 0 0;font-size:12.5px;line-height:1.7;color:var(--muted,#666)}
+.review .btn{width:100%}
+.selfmark{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:12px 0 4px;padding:10px 12px;border:1px solid var(--line,#ddd);border-radius:12px;background:var(--card,#fff)}
+.selfmark>span{font-size:13px;font-weight:700;margin-right:2px}
+.selfmark small{flex-basis:100%;color:var(--muted,#666);font-size:12px}
+.smk{border:1.5px solid var(--line,#ccc);background:var(--card,#fff);color:var(--ink,#222);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700;cursor:pointer;min-height:38px}
+.smk.ok.on{background:var(--maru,#cf3b2a);border-color:var(--maru,#cf3b2a);color:#fff}
+.smk.mid.on{background:var(--sankaku,#d08a12);border-color:var(--sankaku,#d08a12);color:#fff}
+.smk.ng.on{background:var(--batsu,#46566a);border-color:var(--batsu,#46566a);color:#fff}`;
+  const day = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  const addDays = (t, n) => { const d = new Date(t); d.setDate(d.getDate() + n); return day(d.getTime()); };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} };
+  function set(id, g) {
+    const now = Date.now(), today = day(now);
+    const r = D[id] || { st: 0 };
+    if (r.t === undefined || day(r.t) !== today) r.base = r.st || 0;   // その日の最初の評価の前の段階
+    const b = r.base || 0;
+    if (g === "ok") { r.st = Math.min(b + 1, GAP.length); r.due = addDays(today, GAP[r.st - 1]); }
+    else if (g === "mid") { r.st = b; r.due = addDays(today, 1); }
+    else { r.st = 0; r.due = addDays(today, 1); }
+    r.g = g; r.t = now; D[id] = r; save();
+  }
+  return {
+    GAP,
+    init(key) { KEY = key; try { const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st); } catch (e) {} try { D = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { D = {}; } },
+    set,
+    has: id => !!D[id],
+    grade: id => (D[id] && D[id].g) || "",
+    stage: id => (D[id] && D[id].st) || 0,
+    /* 今日（または前から）予定日になっている問題 */
+    isDue: id => !!(D[id] && D[id].due <= day(Date.now())),
+    dueIds(ids) { const t = day(Date.now()); return ids.filter(id => D[id] && D[id].due <= t).sort((a, b) => ({ ng: 0, mid: 1, ok: 2 }[D[a].g] - { ng: 0, mid: 1, ok: 2 }[D[b].g]) || D[a].due - D[b].due); },
+    /* 明日・1週間以内に予定がある問題の数 */
+    upcoming(ids) { const t = day(Date.now()), t1 = addDays(t, 1), t7 = addDays(t, 7); let a = 0, w = 0; ids.forEach(id => { const r = D[id]; if (!r || r.due <= t) return; if (r.due <= t1) a++; if (r.due <= t7) w++; }); return { tomorrow: a, week: w }; },
+    /* 今日つけた評価か */
+    today: id => !!(D[id] && day(D[id].t) === day(Date.now())),
+    /* この部品を入れる前の記録（○×だけ）から予定を作る：×は今日、○は3日後 */
+    seed(id, ok) { if (D[id]) return; const t = day(Date.now()); D[id] = ok ? { st: 1, g: "ok", due: addDays(t, 3), t: 0 } : { st: 0, g: "ng", due: t, t: 0 }; },
+    seedRaw(id, r) { if (!D[id]) D[id] = r; },
+    /* 次に出す日の説明（「明日」「3日後」など） */
+    nextLabel(id) { const r = D[id]; if (!r) return ""; const n = Math.round((r.due - day(Date.now())) / 864e5); return n <= 0 ? "今日" : n === 1 ? "明日" : n === 7 ? "1週間後" : n === 14 ? "2週間後" : n === 30 ? "1か月後" : n === 60 ? "2か月後" : n + "日後"; },
+    flush: save,
+    clear() { D = {}; save(); },
+    dump: () => D
   };
 })();
 
@@ -3648,8 +3746,15 @@ const DAY=864e5;
    正解を重ねるほど、次に出すまでの間隔を長くする：1日→3日→7日→21日 */
 const GAP=[0,1,3,7,21];
 function rec(id){const r=store.res[id];if(!r)return null;if(r.st===undefined){r.st=r.ok?1:0;r.t=r.t||0}return r}
-function mark(id,ok){const r=rec(id)||{n:0,st:0,t:0};r.n=(r.n||0)+1;r.ok=ok;r.st=ok?Math.min((r.st||0)+1,4):0;r.t=Date.now();store.res[id]=r}
-const isDue=id=>{const r=rec(id);if(!r)return false;if(!r.ok)return true;return Date.now()-r.t>=GAP[r.st]*DAY};
+function mark(id,ok){const r=rec(id)||{n:0,st:0,t:0};r.n=(r.n||0)+1;r.ok=ok;r.st=ok?Math.min((r.st||0)+1,4):0;r.t=Date.now();store.res[id]=r;SRS.set(id,ok?"ok":"ng")}
+/* 復習の予定はエビングハウスの忘却曲線（共通部品 srs.js）：×・△は翌日、○は翌日→3日後→1週間後→2週間後→1か月後→2か月後 */
+SRS.init("takken-ox-srs");
+(()=>{const d0=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()},td=d0(Date.now());
+  Object.keys(store.res).forEach(id=>{const r=rec(id);if(!r)return;const st=r.ok?Math.max(r.st||1,1):0;
+    SRS.seedRaw(id,{st,g:r.ok?"ok":"ng",due:r.ok?Math.max(d0((r.t||0)+GAP[Math.min(st,4)]*DAY),td):td,t:0})});SRS.flush()})();
+const isDue=id=>SRS.isDue(id);
+const markOf=(id,answered)=>answered||SRS.today(id)?SRS.grade(id):"";
+const reviewKey=()=>{const d=new Date();return "review:"+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
 const mastered=id=>{const r=rec(id);return !!(r&&r.ok&&r.st>=2)};
 const isOk=q=>{const r=rec(q.id);return !!(r&&r.ok)};
 function stat(qs){return{n:qs.length,ok:qs.filter(isOk).length,done:qs.filter(q=>store.res[q.id]).length,m:qs.filter(q=>mastered(q.id)).length}}
@@ -3674,7 +3779,8 @@ const app=document.getElementById("app");
 MyNote.init("takken-ox-notes");
 /* 進み具合のバーで問題を移動・長押しで一覧（共通部品 qnav.js） */
 QNav.init({
-  state:()=>S.view==="quiz"?{n:S.list.length,cur:S.i,status:S.list.map((id,k)=>S.picks[k]===undefined||S.picks[k]===null?"":(S.picks[k]===QI[id].a?"ok":"ng")),text:k=>QI[S.list[k]].q}:null,
+  state:()=>S.view==="quiz"?{n:S.list.length,cur:S.i,status:S.list.map((id,k)=>{const ans=!(S.picks[k]===undefined||S.picks[k]===null);return markOf(id,ans)||(!ans?"":(S.picks[k]===QI[id].a?"ok":"ng"))}),text:k=>QI[S.list[k]].q}:null,
+  mark:(k,g)=>{SRS.set(S.list[k],g);render()},
   jump:k=>{S.i=k;S.picked=S.picks[k]!==undefined&&S.picks[k]!==null?S.picks[k]:null;saveSes();render();window.scrollTo(0,0)}
 });
 let S={view:"home",list:[],i:0,picked:null,picks:[],results:[],label:"",from:null,key:null};
@@ -3686,9 +3792,24 @@ function saveSes(){if(!S.key)return;store.ses[S.key]={list:S.list,i:S.i,picked:S
 function dropSes(key){if(key&&store.ses[key]){delete store.ses[key];save()}}
 const nextNo=v=>v.i+1+(v.picked!==null&&v.i+1<v.list.length?1:0);
 const validSes=k=>{const v=store.ses[k];return v&&Array.isArray(v.list)&&v.list.length&&v.list.every(id=>QI[id])&&v.i<v.list.length};
-const keyName=k=>{if(k==="mock")return"○×で本番の配分50問";if(k==="all")return"全問シャッフル";if(k==="wrong")return"まちがえた問題";if(k.startsWith("today"))return"今日のおすすめ";const [c,l]=k.split(":");return FIELDS[c]&&LV[l]?FIELDS[c].name+"・"+LV[l].name:k};
+const keyName=k=>{if(k.startsWith("review:"))return"今日の復習";if(k==="mock")return"○×で本番の配分50問";if(k==="all")return"全問シャッフル";if(k==="wrong")return"まちがえた問題";if(k.startsWith("today"))return"今日のおすすめ";const [c,l]=k.split(":");return FIELDS[c]&&LV[l]?FIELDS[c].name+"・"+LV[l].name:k};
 const keyColor=k=>{const c=k.split(":")[0];return FIELDS[c]?FIELDS[c].color:"var(--maru)"};
 
+function reviewHtml(){
+  const ids=Q.map(q=>q.id),due=SRS.dueIds(ids),up=SRS.upcoming(ids),tk=reviewKey(),tv=validSes(tk)?store.ses[tk]:null;
+  const ng=due.filter(id=>SRS.grade(id)==="ng").length,mid=due.filter(id=>SRS.grade(id)==="mid").length,ok=due.length-ng-mid;
+  return `<section class="review">
+    <div class="rvhead"><b>今日の復習</b><small>エビングハウスの忘却曲線に沿って出します</small></div>
+    ${tv?`<p class="rvnum">全${tv.list.length}問のうち<b>次は${nextNo(tv)}問目</b>から</p><button class="btn big" data-act="review">続きから解く</button>`
+      :due.length?`<p class="rvnum"><strong>${due.length}</strong>問（×${ng}・△${mid}・○の確認${ok}）</p><button class="btn big" data-act="review">今日の復習をぜんぶ解く</button>`
+      :`<p class="rvnum">今日の復習はありません。${up.tomorrow?`明日は${up.tomorrow}問。`:""}${up.week?`1週間以内に${up.week}問。`:""}</p>`}
+    <p class="rvnote">×と△の問題は翌日に、○の問題は翌日→3日後→1週間後→2週間後→1か月後→2か月後と、正解を重ねるほど間隔をのばしてもう一度出します（忘れかけたころに思い出すと記憶に残りやすいため）。「今日のおすすめ」にも、この中から最大12問が入ります。評価は、問題画面の「この問題の評価」か、問題の一覧（進み具合のバーを長押し・「一覧」ボタン）の○△×で変えられます。</p>
+  </section>`;
+}
+function selfMarkHtml(id){
+  const g=SRS.grade(id),lab={ok:"○ できた",mid:"△ あいまい",ng:"× まちがい"};
+  return `<div class="selfmark" role="group" aria-label="この問題の評価"><span>この問題の評価</span>${["ok","mid","ng"].map(k=>`<button type="button" class="smk ${k} ${g===k?"on":""}" data-act="smark" data-g="${k}" aria-pressed="${g===k}">${lab[k]}</button>`).join("")}<small>次は${SRS.nextLabel(id)}の「今日の復習」に出ます（○を続けるほど間隔がのびます）</small></div>`;
+}
 function home(){
   const t=stat(Q),pct=Math.round(t.m/t.n*100),w=wrongIds().length;
   const tk=todayKey(),tl=validSes(tk)?store.ses[tk]:null,tlist=tl?null:todayList();
@@ -3696,7 +3817,7 @@ function home(){
   const est=estimate();
   const lastMock=store.mocks.length?store.mocks[store.mocks.length-1]:null;
   const exSes=store.exam&&store.exam.items&&!store.exam.done&&store.exam.i<store.exam.items.length?store.exam:null;
-  const resumeKeys=Object.keys(store.ses).filter(k=>validSes(k)&&!k.startsWith("today")).sort((a,b)=>store.ses[b].ts-store.ses[a].ts);
+  const resumeKeys=Object.keys(store.ses).filter(k=>validSes(k)&&!k.startsWith("today")&&!k.startsWith("review:")).sort((a,b)=>store.ses[b].ts-store.ses[a].ts);
   app.innerHTML=header()+`
   <section class="hero">
     <h1>毎日<span class="ox">20問</span>で、宅建の合格ラインへ。</h1>
@@ -3713,6 +3834,7 @@ function home(){
     <div class="meter" aria-hidden="true"><i style="width:${pct}%"></i></div>
     <p class="est">いまの実力の目安：<b>${est}点</b> / 50点 <small>（覚えた問題の割合から計算。合格ラインは例年35〜38点前後）</small></p>
   </section>
+  ${reviewHtml()}
   ${exSes?`<section class="resume"><h2>続きから解く（本番形式）</h2><div class="resitem" style="--fc:var(--maru)"><span class="t">本番形式の模試 50問<small>全50問のうち${exSes.i}問を解答ずみ</small></span><button class="btn" data-act="exresume">続きから</button><button class="ghost" data-act="exdrop">やめる</button></div></section>`:""}
   ${resumeKeys.length?`<section class="resume"><h2>続きから解く</h2>${resumeKeys.map(k=>{const v=store.ses[k];const pos=v.i+(v.picked!==null?1:0);return `
       <div class="resitem" style="--fc:${keyColor(k)}"><span class="t">${keyName(k)}<small>全${v.list.length}問のうち${pos}問を解答ずみ。次は${nextNo(v)}問目から</small></span>
@@ -3799,7 +3921,7 @@ function quiz(){
       <button class="choice x ${answered?(S.picked===false?"picked":"dim"):""}" data-act="pick" data-v="0" ${answered?"disabled":""}><span class="mk">×</span><span class="lb">まちがい</span></button>
     </div>`;
   if(!answered){out+=`<div class="kbd">キーボードなら O / X で答えられます</div>${MyNote.slot(q.id)}</article>`;app.innerHTML=out;return}
-  const r=rec(q.id);const nextTxt=ok?(r&&r.st>=4?"しっかり覚えました。次は21日後に確認します":`次は${GAP[Math.min(r?r.st:1,4)]}日後にもう一度出します`):"まちがえた問題は、今日の復習にもう一度出します";
+  const r=rec(q.id);const nextTxt=ok?`次は${SRS.nextLabel(q.id)}の復習にもう一度出します`:"まちがえた問題は、明日の復習にもう一度出します";
   out+=`<div class="verdict ${ok?"ok":"ng"}" role="status"><span class="big">${ok?"○":"×"}</span><div><h3>${ok?"正解！":"ざんねん"}</h3><p>この文は「<b>${q.a?"○ 正しい":"× まちがい"}</b>」です。${nextTxt}</p></div></div>
     <div class="exp">
       <div class="point"><span><span class="plbl">ここがポイント</span>${q.pt}</span></div>
@@ -3810,6 +3932,7 @@ function quiz(){
       ${q.w?`<div><h4>ことばメモ</h4><dl class="words">${q.w.map(w=>`<div><dt><ruby>${w[0]}<rt>${w[1]}</rt></ruby></dt><dd>${w[2]}</dd></div>`).join("")}</dl></div>`:""}
       ${MyNote.slot(q.id)}
     </div>
+    ${selfMarkHtml(q.id)}
     <div class="qnav">${S.i>0?`<button class="btn sub" data-act="prev">← 前の問題</button>`:""}<button class="btn" data-act="next" id="nextBtn">${S.i+1<S.list.length?"次の問題へ":"結果を見る"}</button></div>
   </article>`;
   app.innerHTML=out;
@@ -3933,6 +4056,8 @@ function prev(){if(S.i>0){S.i--;S.picked=S.picks[S.i]!==undefined?S.picks[S.i]:n
 app.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
   if(a==="home"){S.view="home";render();window.scrollTo(0,0)}
+  else if(a==="review"){const k=reviewKey();Object.keys(store.ses).forEach(x=>{if(x.startsWith("review:")&&x!==k)delete store.ses[x]});resumeOr(k,()=>SRS.dueIds(Q.map(q=>q.id)),"今日の復習")}
+  else if(a==="smark"){SRS.set(S.list[S.i],b.dataset.g);render()}
   else if(a==="today"){const k=todayKey();Object.keys(store.ses).forEach(x=>{if(x.startsWith("today")&&x!==k)delete store.ses[x]});resumeOr(k,todayList,"今日のおすすめ")}
   else if(a==="lv"){const c=b.dataset.c,l=+b.dataset.lv;resumeOr(c+":"+l,()=>setOf(c,l).map(q=>q.id),FIELDS[c].name+"・"+LV[l].name,{c,lv:l})}
   else if(a==="mock"){resumeOr("mock",mock,"○×で本番の配分50問")}
@@ -3956,7 +4081,7 @@ app.addEventListener("click",e=>{
   else if(a==="expick"){exPick(+b.dataset.v)}
   else if(a==="exnext"){exNext()}
   else if(a==="reset"){
-    if(b.dataset.sure){store={res:{},ses:{},mocks:[]};save();render()}
+    if(b.dataset.sure){store={res:{},ses:{},mocks:[]};save();SRS.clear();render()}
     else{b.dataset.sure="1";b.textContent="本当に消す？（もう一度押す）"}
   }
 });
@@ -3975,7 +4100,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第8版（2026年10月6日更新：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第9版（2026年10月6日更新：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -3986,8 +4111,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v8").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v8").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v9").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v9").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
