@@ -3753,6 +3753,8 @@ SRS.init("takken-ox-srs");
   Object.keys(store.res).forEach(id=>{const r=rec(id);if(!r)return;const st=r.ok?Math.max(r.st||1,1):0;
     SRS.seedRaw(id,{st,g:r.ok?"ok":"ng",due:r.ok?Math.max(d0((r.t||0)+GAP[Math.min(st,4)]*DAY),td):td,t:0})});SRS.flush()})();
 const isDue=id=>SRS.isDue(id);
+/* ○△×を付けたら「解いた」扱いにする（○＝正解、△・×＝まちがい・要復習） */
+function rate(id,g){SRS.set(id,g);const r=rec(id)||{n:0,st:0,t:0};r.n=r.n||1;r.ok=g==="ok";if(!r.ok)r.st=0;else if(!r.st)r.st=1;r.t=Date.now();store.res[id]=r;save()}
 const markOf=(id,answered)=>answered||SRS.today(id)?SRS.grade(id):"";
 const reviewKey=()=>{const d=new Date();return "review:"+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
 const mastered=id=>{const r=rec(id);return !!(r&&r.ok&&r.st>=2)};
@@ -3780,7 +3782,7 @@ MyNote.init("takken-ox-notes");
 /* 進み具合のバーで問題を移動・長押しで一覧（共通部品 qnav.js） */
 QNav.init({
   state:()=>S.view==="quiz"?{n:S.list.length,cur:S.i,status:S.list.map((id,k)=>{const ans=!(S.picks[k]===undefined||S.picks[k]===null);return markOf(id,ans)||(!ans?"":(S.picks[k]===QI[id].a?"ok":"ng"))}),text:k=>QI[S.list[k]].q}:null,
-  mark:(k,g)=>{SRS.set(S.list[k],g);render()},
+  mark:(k,g)=>{rate(S.list[k],g);render()},
   jump:k=>{S.i=k;S.picked=S.picks[k]!==undefined&&S.picks[k]!==null?S.picks[k]:null;saveSes();render();window.scrollTo(0,0)}
 });
 let S={view:"home",list:[],i:0,picked:null,picks:[],results:[],label:"",from:null,key:null};
@@ -4057,7 +4059,7 @@ app.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
   if(a==="home"){S.view="home";render();window.scrollTo(0,0)}
   else if(a==="review"){const k=reviewKey();Object.keys(store.ses).forEach(x=>{if(x.startsWith("review:")&&x!==k)delete store.ses[x]});resumeOr(k,()=>SRS.dueIds(Q.map(q=>q.id)),"今日の復習")}
-  else if(a==="smark"){SRS.set(S.list[S.i],b.dataset.g);render()}
+  else if(a==="smark"){rate(S.list[S.i],b.dataset.g);render()}
   else if(a==="today"){const k=todayKey();Object.keys(store.ses).forEach(x=>{if(x.startsWith("today")&&x!==k)delete store.ses[x]});resumeOr(k,todayList,"今日のおすすめ")}
   else if(a==="lv"){const c=b.dataset.c,l=+b.dataset.lv;resumeOr(c+":"+l,()=>setOf(c,l).map(q=>q.id),FIELDS[c].name+"・"+LV[l].name,{c,lv:l})}
   else if(a==="mock"){resumeOr("mock",mock,"○×で本番の配分50問")}
@@ -4100,7 +4102,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第9版（2026年10月6日更新：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第10版（2026年10月7日更新：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -4111,8 +4113,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v9").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v9").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v10").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v10").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>

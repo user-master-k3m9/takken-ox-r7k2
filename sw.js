@@ -1,6 +1,6 @@
 // 通信できるときは最新の版を取りに行き（3.5秒で返事がなければ保存済みの版）、
 // 通信できないときは保存済みの版で動かす
-const VER = "takken-ox-v9";
+const VER = "takken-ox-v10";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "maskable-512.png", "apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VER).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: "reload" })))).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VER).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
