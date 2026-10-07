@@ -3744,6 +3744,32 @@ const SRS = (() => {
   };
 })();
 
+/* 共有ボタン（ホームのいちばん下）：Share.html("アプリ名", "既定のアドレス", "注意書き") */
+const Share = (() => {
+  let T = "", U = "";
+  const url = () => { try { if (/^https?:/.test(location.href)) return location.origin + location.pathname; } catch (e) {} return U; };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const copy = u => { try { navigator.clipboard.writeText(u).then(() => alert("アドレスをコピーしました"), () => prompt("このアドレスをコピーしてください", u)); } catch (e) { prompt("このアドレスをコピーしてください", u); } };
+  try {
+    const st = document.createElement("style");
+    st.textContent = ".shx{margin:22px 0 10px;padding:14px;border:1px solid var(--line,#ccc);border-radius:12px;display:grid;gap:10px}.shx h2{font-size:17px;margin:0}.shx p{margin:0;font-size:14px;line-height:1.7}.shx .u{word-break:break-all;font-weight:700}.shx .r{display:flex;flex-wrap:wrap;gap:8px}.shx button{min-height:44px;padding:0 18px;font-size:15px;border-radius:10px;cursor:pointer}";
+    document.head.appendChild(st);
+    document.addEventListener("click", e => {
+      const b = e.target.closest && e.target.closest("[data-shx]"); if (!b) return;
+      const u = url();
+      if (b.dataset.shx === "share" && navigator.share) navigator.share({ title: T, url: u }).catch(() => {});
+      else copy(u);
+    });
+  } catch (e) {}
+  return {
+    html(title, def, note) {
+      T = title; U = def;
+      return `<section class="shx"><h2>このアプリを共有</h2><p>アドレス：<span class="u">${esc(url())}</span></p>
+      <div class="r"><button type="button" class="btn" data-shx="share">共有する</button><button type="button" class="ghost" data-shx="copy">アドレスをコピー</button></div>${note ? `<p>${esc(note)}</p>` : ""}</section>`;
+    }
+  };
+})();
+
 /* ---------- レベル・並び ---------- */
 const LV={1:{name:"基礎",sub:"ことばとしくみ"},2:{name:"標準",sub:"よく出るルール"},3:{name:"合格レベル",sub:"本番でまちがえやすい所"}};
 const ORDER=["gyo","ken","hou","zei"];
@@ -3929,7 +3955,8 @@ function home(){
     <div class="rlist">${ORDER.map(k=>{const f=FIELDS[k],n=setOf(k).filter(q=>store.res[q.id]||SRS.has(q.id)).length;return `<div class="rrow" style="--fc:${f.color}"><span>${f.name}<small>記録 ${n}問</small></span><button class="ghost" data-act="resetf" data-c="${k}" ${n?"":"disabled"}>この分野をリセット</button></div>`}).join("")}</div>
     <p style="margin-top:12px"><button class="ghost danger" data-act="reset">全部リセット</button></p>
   </details>
-  <p class="foot">記録はこの端末のブラウザにだけ保存されます。問題文と解説は学習用にやさしく書き直したオリジナルです（過去問の転載ではありません）。法改正があるので、受験する年の最新テキストでも確認してください（内容は2026年10月時点の法令にもとづきます）。</p>`;
+  <p class="foot">記録はこの端末のブラウザにだけ保存されます。問題文と解説は学習用にやさしく書き直したオリジナルです（過去問の転載ではありません）。法改正があるので、受験する年の最新テキストでも確認してください（内容は2026年10月時点の法令にもとづきます）。</p>
+  ${Share.html("宅建○×一問一答", "https://user-master-k3m9.github.io/takken-ox-r7k2/", "")}`;
   const mt=document.getElementById("mnTools");if(mt)mt.appendChild(MyNote.tools(()=>{if(S.view==="home")render()}));
 }
 
@@ -4171,7 +4198,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第12版（2026年10月7日更新：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第13版（2026年10月7日更新：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
