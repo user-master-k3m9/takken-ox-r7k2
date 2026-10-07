@@ -3764,12 +3764,49 @@ const Share = (() => {
   return {
     html(title, def, note) {
       T = title; U = def;
-      return `<section class="shx"><h2>このアプリを共有</h2><p>アドレス：<span class="u">${esc(url())}</span></p>
-      <div class="r"><button type="button" class="btn" data-shx="share">共有する</button><button type="button" class="ghost" data-shx="copy">アドレスをコピー</button></div>${note ? `<p>${esc(note)}</p>` : ""}</section>`;
+      return `<section class="shx"><h2>共有・バックアップ</h2><p>アドレス：<span class="u">${esc(url())}</span></p>
+      <div class="r"><button type="button" class="btn" data-shx="share">共有する</button><button type="button" class="ghost" data-shx="copy">アドレスをコピー</button></div>${note ? `<p>${esc(note)}</p>` : ""}${typeof Edit !== "undefined" ? Edit.tools() : ""}</section>`;
     }
   };
 })();
 
+/* 解説を自分で編集：Edit.init("保存キー")、Edit.box(問題id, 元の解説HTML, "見出しの後ろに出す名前") */
+const Edit = (() => {
+  let K = "quiz-edits", ED = {};
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const save = () => { try { localStorage.setItem(K, JSON.stringify(ED)); } catch (e) {} };
+  const plain = h => { const d = document.createElement("div"); d.innerHTML = String(h || "").replace(/<br\s*\/?>/gi, "\n").replace(/<\/(p|div|li|tr)>/gi, "\n"); return d.textContent.replace(/\n{3,}/g, "\n\n").trim(); };
+  const ORIG = {};
+  const view = id => ED[id] != null ? `<div class="body edxmine">${esc(ED[id]).replace(/\n/g, "<br>")}</div><p class="edxtag">（自分で編集した解説）</p>` : `<div class="body">${ORIG[id] || ""}</div>`;
+  const inner = id => view(id) + `<button type="button" class="ghost edxb" data-edx="open">✎ 解説を編集</button>`;
+  try {
+    const st = document.createElement("style");
+    st.textContent = ".edx{display:grid;gap:8px}.edxb{justify-self:start;min-height:38px;font-size:13px;padding:0 14px;border-radius:9px;cursor:pointer}.edxtag{margin:0;font-size:12.5px;color:var(--muted,#777)}.edx textarea{width:100%;box-sizing:border-box;font-size:16px;line-height:1.7;padding:8px 10px;border:1px solid var(--line,#ccc);border-radius:8px;background:var(--surface,#fff);color:inherit}.edx .r{display:flex;flex-wrap:wrap;gap:8px}.edx .r button{min-height:40px;padding:0 16px;border-radius:9px;cursor:pointer}";
+    document.head.appendChild(st);
+    document.addEventListener("click", e => {
+      const b = e.target.closest && e.target.closest("[data-edx]"); if (!b) return;
+      const w = b.closest(".edx"), act = b.dataset.edx;
+      if (act === "export") { const n = Object.keys(ED).length; if (!n) { alert("編集した解説はまだありません"); return; } const blob = new Blob([JSON.stringify({ app: K, date: new Date().toISOString(), edits: ED }, null, 1)], { type: "application/json" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "編集した解説.json"; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); return; }
+      if (!w) return; const id = w.dataset.id;
+      if (act === "open") { w.innerHTML = `<textarea rows="8">${esc(ED[id] != null ? ED[id] : plain(ORIG[id]))}</textarea><div class="r"><button type="button" class="btn" data-edx="save">保存</button><button type="button" class="ghost" data-edx="cancel">やめる</button>${ED[id] != null ? `<button type="button" class="ghost" data-edx="reset">元の解説に戻す</button>` : ""}</div><p class="edxtag">この端末にだけ保存されます。ホームのいちばん下で書き出し・読み込みができます。</p>`; w.querySelector("textarea").focus(); }
+      else if (act === "save") { const v = w.querySelector("textarea").value; if (v.trim() === plain(ORIG[id]).trim() || !v.trim()) delete ED[id]; else ED[id] = v; save(); w.innerHTML = inner(id); }
+      else if (act === "cancel") w.innerHTML = inner(id);
+      else if (act === "reset") { if (confirm("この問題の解説を元に戻します。自分で編集した内容は消えます。\n\n本当に戻しますか？")) { delete ED[id]; save(); w.innerHTML = inner(id); } }
+    });
+    document.addEventListener("change", e => {
+      if (!e.target || e.target.dataset.edx !== "import" || !e.target.files[0]) return;
+      const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result), x = d.edits || d; let n = 0; Object.keys(x).forEach(k => { if (typeof x[k] === "string") { ED[k] = x[k]; n++; } }); save(); alert(n + "問の解説を読み込みました"); } catch (err) { alert("読み込めませんでした"); } e.target.value = ""; }; r.readAsText(e.target.files[0]);
+    });
+  } catch (e) {}
+  return {
+    init(key) { K = key; try { ED = JSON.parse(localStorage.getItem(K) || "{}") || {}; } catch (e) { ED = {}; } },
+    box(id, html) { ORIG[id] = html; return `<div class="edx" data-id="${esc(id)}">${inner(id)}</div>`; },
+    count() { return Object.keys(ED).length; },
+    tools() { return `<p><b>自分で編集した解説（${Object.keys(ED).length}問）</b></p><div class="r"><button type="button" class="ghost" data-edx="export">書き出す（ファイル）</button><label class="ghost" style="display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:10px;cursor:pointer">読み込む<input type="file" data-edx="import" accept=".json,application/json" hidden></label></div>`; }
+  };
+})();
+
+Edit.init("takken-ox-edits");
 /* ---------- レベル・並び ---------- */
 const LV={1:{name:"基礎",sub:"ことばとしくみ"},2:{name:"標準",sub:"よく出るルール"},3:{name:"合格レベル",sub:"本番でまちがえやすい所"}};
 const ORDER=["gyo","ken","hou","zei"];
@@ -3994,7 +4031,7 @@ function quiz(){
   out+=`<div class="verdict ${ok?"ok":"ng"}" role="status"><span class="big">${ok?"○":"×"}</span><div><h3>${ok?"正解！":"ざんねん"}</h3><p>この文は「<b>${q.a?"○ 正しい":"× まちがい"}</b>」です。${nextTxt}</p></div></div>
     <div class="exp">
       <div class="point"><span><span class="plbl">ここがポイント</span>${q.pt}</span></div>
-      <div><h4>くわしい解説</h4><div class="body">${q.exp}</div></div>
+      <div><h4>くわしい解説</h4>${Edit.box(q.id,q.exp)}</div>
       ${figHtml(q)}
       ${goroHtml(q)}
       <div class="hon"><span class="lbl">本番の試験では、こんな書き方で出ます</span>「${honText(q)}」<br><b>→ ${isFalseHon(q)?"誤り":"正しい"}</b></div>
@@ -4073,7 +4110,7 @@ function examView(){
     const ok=E.picked===correctOpt;
     out+=`<div class="verdict ${ok?"ok":"ng"}" role="status"><span class="big">${ok?"○":"×"}</span><div><h3>${ok?"正解！":"ざんねん"}</h3><p>正解は「${opts[correctOpt]}」です。それぞれの文の解説は下にあります。</p></div></div>
     <div class="exexp">${qs.map((q,i)=>`<details class="stexp"><summary><span class="${isFalseHon(q)?"n":"y"}">${isFalseHon(q)?"×":"○"}</span> ${it.type==="count"?KANA[i]:i+1}　${q.pt}</summary>
-      <div class="exp"><div class="body">${q.exp}</div>${figHtml(q)}${goroHtml(q)}</div></details>`).join("")}</div>
+      <div class="exp">${Edit.box(q.id,q.exp)}${figHtml(q)}${goroHtml(q)}</div></details>`).join("")}</div>
     <div class="qnav">${E.i>0?`<button class="btn sub" data-act="exprev">← 前の問題</button>`:""}<button class="btn" data-act="exnext" id="nextBtn">${E.i+1<E.items.length?"次の問題へ":"結果を見る"}</button></div>`;
   }
   out+=`</article>`;
@@ -4198,7 +4235,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第13版（2026年10月7日更新：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第14版（2026年10月7日更新：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -4209,8 +4246,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v12").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v12").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v14").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v14").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
