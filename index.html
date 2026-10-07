@@ -292,6 +292,10 @@ mark{background:linear-gradient(transparent 45%,var(--hl) 45%);color:inherit;pad
 .rrow .ghost{min-height:40px;white-space:nowrap}.rrow .ghost:disabled{opacity:.35}
 .ghost.danger{color:var(--ng,#c2410c);border-color:var(--ng,#c2410c)}
 .selfmark .qclr{display:block;margin-top:8px;font-size:13px;min-height:36px}
+.rbar{margin:28px 0 8px;padding-top:14px;border-top:1px dashed var(--line);text-align:center}
+.rbar>.ghost{min-height:40px;color:var(--muted)}
+.rmenu{margin-top:10px;display:grid;gap:8px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.rmenu[hidden]{display:none}.rmenu p{margin:0 0 4px;font-size:14px;font-weight:700}.rmenu .ghost{min-height:44px;font-size:15px}
 </style>
 </head>
 <body>
@@ -3763,7 +3767,17 @@ SRS.init("takken-ox-srs");
     SRS.seedRaw(id,{st,g:r.ok?"ok":"ng",due:r.ok?Math.max(d0((r.t||0)+GAP[Math.min(st,4)]*DAY),td):td,t:0})});SRS.flush()})();
 const isDue=id=>SRS.isDue(id);
 /* ○△×を付けたら「解いた」扱いにする（○＝正解、△・×＝まちがい・要復習） */
-function clearIds(ids,keys){ids.forEach(id=>{delete store.res[id]});SRS.del(ids);(keys||[]).forEach(k=>{delete store.ses[k]});save()}
+/* 「解いていない」状態に戻す：解答ずみの位置から外し、今の位置（次に解く所）に入れ直す */
+function unsolveIn(v,set,fp){if(!v||!Array.isArray(v.list))return;
+  const L=v.list.slice(),P=L.map((_,k)=>v.picks?v.picks[k]:undefined),R=fp?(v.results||[]).slice():null;
+  let p=fp?R.length:v.i+(v.picked!==null&&v.picked!==undefined?1:0);const mv=[];
+  for(let k=L.length-1;k>=0;k--){if(!set.has(L[k]))continue;if(k<p){mv.unshift(L[k]);L.splice(k,1);P.splice(k,1);if(fp)R.splice(k,1);p--}else P[k]=undefined}
+  L.splice(p,0,...mv);P.splice(p,0,...mv.map(()=>undefined));
+  v.list=L;v.picks=P;v.results=fp?R:(v.results||[]).filter(r=>!set.has(r.id));
+  if(mv.length){v.i=Math.min(p,L.length-1);v.picked=null}}
+function clearIds(ids,keys){const set=new Set(ids);ids.forEach(id=>{delete store.res[id]});SRS.del(ids);(keys||[]).forEach(k=>{delete store.ses[k]});
+  Object.values(store.ses).forEach(v=>unsolveIn(v,set,false));
+  if(S.view==="quiz"){unsolveIn(S,set,false);if(set.has(S.list[S.i]))S.picked=null;S.sel=[];saveSes()}save()}
 const ASK="\n\n本当に消しますか？";
 function rate(id,g){SRS.set(id,g);const r=rec(id)||{n:0,st:0,t:0};r.n=r.n||1;r.ok=g==="ok";if(!r.ok)r.st=0;else if(!r.st)r.st=1;r.t=Date.now();store.res[id]=r;save()}
 const markOf=(id,answered)=>answered||SRS.today(id)?SRS.grade(id):"";
@@ -3821,7 +3835,7 @@ function reviewHtml(){
 }
 function selfMarkHtml(id){
   const g=SRS.grade(id),lab={ok:"○ できた",mid:"△ あいまい",ng:"× まちがい"};
-  return `<div class="selfmark" role="group" aria-label="この問題の評価"><span>この問題の評価</span>${["ok","mid","ng"].map(k=>`<button type="button" class="smk ${k} ${g===k?"on":""}" data-act="smark" data-g="${k}" aria-pressed="${g===k}">${lab[k]}</button>`).join("")}<small>次は${SRS.nextLabel(id)}の「今日の復習」に出ます（○を続けるほど間隔がのびます）</small>${store.res[id]||SRS.has(id)?`<button type="button" class="ghost qclr" data-act="qclr">この問題の記録を消す</button>`:""}</div>`;
+  return `<div class="selfmark" role="group" aria-label="この問題の評価"><span>この問題の評価</span>${["ok","mid","ng"].map(k=>`<button type="button" class="smk ${k} ${g===k?"on":""}" data-act="smark" data-g="${k}" aria-pressed="${g===k}">${lab[k]}</button>`).join("")}<small>次は${SRS.nextLabel(id)}の「今日の復習」に出ます（○を続けるほど間隔がのびます）</small></div>`;
 }
 function home(){
   const t=stat(Q),pct=Math.round(t.m/t.n*100),w=wrongIds().length;
@@ -3901,10 +3915,10 @@ function home(){
     <p><b>統計</b>の問題（毎年1問）は、<b>2026年度（令和8年度）試験用</b>の数字（地価公示・住宅着工・法人企業統計・宅建業者数・土地取引件数）を「税・その他」に入れています。数字は毎年変わるので、2027年以降に受ける場合は最新の数字に置きかえてください。</p>
   </details>
   <details class="panel">
-    <summary>記録を消す（分野ごと・全部）</summary>
-    <p>まちがえて解いたときなどに、記録を消せます。消えるのは、正解・まちがいの記録、○△×の評価、復習の予定、途中の続きです。<b>自分メモは消えません。</b>1問だけ消すときは、その問題の答えのあとにある「この問題の記録を消す」を使います。</p>
-    <div class="rlist">${ORDER.map(k=>{const f=FIELDS[k],n=setOf(k).filter(q=>store.res[q.id]||SRS.has(q.id)).length;return `<div class="rrow" style="--fc:${f.color}"><span>${f.name}<small>記録 ${n}問</small></span><button class="ghost" data-act="resetf" data-c="${k}" ${n?"":"disabled"}>この分野を消す</button></div>`}).join("")}</div>
-    <p style="margin-top:12px"><button class="ghost danger" data-act="reset">全部の記録を消す</button></p>
+    <summary>リセット（まだ解いていない状態に戻す／分野ごと・全部）</summary>
+    <p>まちがえて解いたときなどに、問題を「まだ解いていない」状態に戻せます。正解・まちがいの記録、○△×の評価、復習の予定、途中の続きが消え、次からはその問題をもう一度解けます。<b>自分メモは消えません。</b>1問だけ、または解いている単元だけ戻すときは、問題画面のいちばん下の「リセット」を使います。</p>
+    <div class="rlist">${ORDER.map(k=>{const f=FIELDS[k],n=setOf(k).filter(q=>store.res[q.id]||SRS.has(q.id)).length;return `<div class="rrow" style="--fc:${f.color}"><span>${f.name}<small>記録 ${n}問</small></span><button class="ghost" data-act="resetf" data-c="${k}" ${n?"":"disabled"}>この分野をリセット</button></div>`}).join("")}</div>
+    <p style="margin-top:12px"><button class="ghost danger" data-act="reset">全部リセット</button></p>
   </details>
   <p class="foot">記録はこの端末のブラウザにだけ保存されます。問題文と解説は学習用にやさしく書き直したオリジナルです（過去問の転載ではありません）。法改正があるので、受験する年の最新テキストでも確認してください（内容は2026年10月時点の法令にもとづきます）。</p>`;
   const mt=document.getElementById("mnTools");if(mt)mt.appendChild(MyNote.tools(()=>{if(S.view==="home")render()}));
@@ -4059,7 +4073,13 @@ function examEnd(){
   </section>`;
 }
 
-function render(){({home,quiz,end,exam:examView,exend:examEnd})[S.view]()}
+function render(){({home,quiz,end,exam:examView,exend:examEnd})[S.view]();if(S.view==="quiz")resetBar()}
+const QI_=id=>QI[id],FKEY=q=>q.c;
+/* 問題画面のいちばん下のリセット（この問題／この単元を選ぶ） */
+function resetBar(){const q=QI_(S.list[S.i]);if(!q)return;const c=FKEY(q),f=FIELDS[c];const d=document.createElement("div");d.className="rbar";
+  d.innerHTML=`<button type="button" class="ghost" data-act="rmenu">リセット</button><div class="rmenu" hidden><p>どちらをリセットしますか？（まだ解いていない状態に戻します）</p><button type="button" class="ghost" data-act="qclr">この問題をリセット</button><button type="button" class="ghost" data-act="resetf" data-c="${c}"${q.g?` data-g="${q.g}"`:""}>この単元（${f.name}）をリセット</button><button type="button" class="ghost" data-act="rmenu">やめる</button></div>`;
+  app.appendChild(d)}
+
 
 function pick(v){
   if(S.picked!==null)return;
@@ -4100,15 +4120,16 @@ app.addEventListener("click",e=>{
   else if(a==="expick"){exPick(+b.dataset.v)}
   else if(a==="exnext"){exNext()}
   else if(a==="reset"){
-    if(confirm("全部の分野の記録（正解・まちがい、○△×の評価、復習の予定、途中の続き、模擬試験の結果）を消します。自分メモは残ります。"+ASK)){store={res:{},ses:{},mocks:[]};save();SRS.clear();render()}
+    if(confirm("全部の問題を「まだ解いていない」状態に戻します（正解・まちがい、○△×の評価、復習の予定、途中の続き、模擬試験の結果を消します）。自分メモは残ります。"+ASK)){store={res:{},ses:{},mocks:[]};save();SRS.clear();render()}
   }
+  else if(a==="rmenu"){const m=document.querySelector(".rmenu");if(m){m.hidden=!m.hidden;if(!m.hidden)m.scrollIntoView({block:"nearest"})}}
   else if(a==="resetf"){
     const c=b.dataset.c,ids=setOf(c).map(q=>q.id),n=ids.filter(id=>store.res[id]||SRS.has(id)).length;
-    if(confirm(`「${FIELDS[c].name}」の記録（${n}問分）を消します。\n正解・まちがい、○△×の評価、復習の予定、この分野の途中の続きが消えます。自分メモは残ります。`+ASK)){clearIds(ids,Object.keys(store.ses).filter(k=>k.startsWith(c+":")));render()}
+    if(confirm(`「${FIELDS[c].name}」の${n}問を「まだ解いていない」状態に戻します。\n正解・まちがい、○△×の評価、復習の予定、この分野の途中の続きが消えます。自分メモは残ります。`+ASK)){clearIds(ids,Object.keys(store.ses).filter(k=>k.startsWith(c+":")));render()}
   }
   else if(a==="qclr"){
     const id=S.list[S.i];
-    if(confirm("この問題の記録（正解・まちがい、○△×の評価、復習の予定）を消します。自分メモは残ります。"+ASK)){clearIds([id]);S.results=(S.results||[]).filter(r=>r.id!==id);saveSes();render()}
+    if(confirm("この問題を「まだ解いていない」状態に戻します（正解・まちがい、○△×の評価、復習の予定を消します）。自分メモは残ります。"+ASK)){clearIds([id]);render()}
   }
 });
 document.addEventListener("keydown",e=>{
