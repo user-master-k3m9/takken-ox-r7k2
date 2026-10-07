@@ -285,6 +285,13 @@ mark{background:linear-gradient(transparent 45%,var(--hl) 45%);color:inherit;pad
 .seen{font-size:11px;color:var(--muted);margin-left:8px;letter-spacing:0;font-weight:400}
 .miss b.okm{color:var(--maru)}
 .qnav .btn.sub{flex:0 1 auto}
+
+.rlist{display:grid;gap:8px}
+.rrow{display:flex;align-items:center;gap:10px;justify-content:space-between;border:1px solid var(--line);border-left:5px solid var(--fc);border-radius:10px;padding:8px 12px;background:var(--card)}
+.rrow span{font-size:14.5px;font-weight:700}.rrow small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.rrow .ghost{min-height:40px;white-space:nowrap}.rrow .ghost:disabled{opacity:.35}
+.ghost.danger{color:var(--ng,#c2410c);border-color:var(--ng,#c2410c)}
+.selfmark .qclr{display:block;margin-top:8px;font-size:13px;min-height:36px}
 </style>
 </head>
 <body>
@@ -3719,6 +3726,8 @@ const SRS = (() => {
     nextLabel(id) { const r = D[id]; if (!r) return ""; const n = Math.round((r.due - day(Date.now())) / 864e5); return n <= 0 ? "今日" : n === 1 ? "明日" : n === 7 ? "1週間後" : n === 14 ? "2週間後" : n === 30 ? "1か月後" : n === 60 ? "2か月後" : n + "日後"; },
     flush: save,
     clear() { D = {}; save(); },
+    /* 指定した問題の予定だけ消す（分野ごと・1問ごとのリセット） */
+    del(ids) { ids.forEach(id => { delete D[id]; }); save(); },
     dump: () => D
   };
 })();
@@ -3754,6 +3763,8 @@ SRS.init("takken-ox-srs");
     SRS.seedRaw(id,{st,g:r.ok?"ok":"ng",due:r.ok?Math.max(d0((r.t||0)+GAP[Math.min(st,4)]*DAY),td):td,t:0})});SRS.flush()})();
 const isDue=id=>SRS.isDue(id);
 /* ○△×を付けたら「解いた」扱いにする（○＝正解、△・×＝まちがい・要復習） */
+function clearIds(ids,keys){ids.forEach(id=>{delete store.res[id]});SRS.del(ids);(keys||[]).forEach(k=>{delete store.ses[k]});save()}
+const ASK="\n\n本当に消しますか？";
 function rate(id,g){SRS.set(id,g);const r=rec(id)||{n:0,st:0,t:0};r.n=r.n||1;r.ok=g==="ok";if(!r.ok)r.st=0;else if(!r.st)r.st=1;r.t=Date.now();store.res[id]=r;save()}
 const markOf=(id,answered)=>answered||SRS.today(id)?SRS.grade(id):"";
 const reviewKey=()=>{const d=new Date();return "review:"+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
@@ -3810,7 +3821,7 @@ function reviewHtml(){
 }
 function selfMarkHtml(id){
   const g=SRS.grade(id),lab={ok:"○ できた",mid:"△ あいまい",ng:"× まちがい"};
-  return `<div class="selfmark" role="group" aria-label="この問題の評価"><span>この問題の評価</span>${["ok","mid","ng"].map(k=>`<button type="button" class="smk ${k} ${g===k?"on":""}" data-act="smark" data-g="${k}" aria-pressed="${g===k}">${lab[k]}</button>`).join("")}<small>次は${SRS.nextLabel(id)}の「今日の復習」に出ます（○を続けるほど間隔がのびます）</small></div>`;
+  return `<div class="selfmark" role="group" aria-label="この問題の評価"><span>この問題の評価</span>${["ok","mid","ng"].map(k=>`<button type="button" class="smk ${k} ${g===k?"on":""}" data-act="smark" data-g="${k}" aria-pressed="${g===k}">${lab[k]}</button>`).join("")}<small>次は${SRS.nextLabel(id)}の「今日の復習」に出ます（○を続けるほど間隔がのびます）</small>${store.res[id]||SRS.has(id)?`<button type="button" class="ghost qclr" data-act="qclr">この問題の記録を消す</button>`:""}</div>`;
 }
 function home(){
   const t=stat(Q),pct=Math.round(t.m/t.n*100),w=wrongIds().length;
@@ -3889,7 +3900,13 @@ function home(){
     <p>★の数は「本番でよく出る度合い」です。おすすめは、★の多い所・基礎から順に出します。いちばん点を取りやすいのは<b>宅建業法</b>（20問）です。</p>
     <p><b>統計</b>の問題（毎年1問）は、<b>2026年度（令和8年度）試験用</b>の数字（地価公示・住宅着工・法人企業統計・宅建業者数・土地取引件数）を「税・その他」に入れています。数字は毎年変わるので、2027年以降に受ける場合は最新の数字に置きかえてください。</p>
   </details>
-  <p class="foot">記録はこの端末のブラウザにだけ保存されます。問題文と解説は学習用にやさしく書き直したオリジナルです（過去問の転載ではありません）。法改正があるので、受験する年の最新テキストでも確認してください（内容は2026年10月時点の法令にもとづきます）。 <button class="ghost" data-act="reset" style="margin-left:4px">記録を消す</button></p>`;
+  <details class="panel">
+    <summary>記録を消す（分野ごと・全部）</summary>
+    <p>まちがえて解いたときなどに、記録を消せます。消えるのは、正解・まちがいの記録、○△×の評価、復習の予定、途中の続きです。<b>自分メモは消えません。</b>1問だけ消すときは、その問題の答えのあとにある「この問題の記録を消す」を使います。</p>
+    <div class="rlist">${ORDER.map(k=>{const f=FIELDS[k],n=setOf(k).filter(q=>store.res[q.id]||SRS.has(q.id)).length;return `<div class="rrow" style="--fc:${f.color}"><span>${f.name}<small>記録 ${n}問</small></span><button class="ghost" data-act="resetf" data-c="${k}" ${n?"":"disabled"}>この分野を消す</button></div>`}).join("")}</div>
+    <p style="margin-top:12px"><button class="ghost danger" data-act="reset">全部の記録を消す</button></p>
+  </details>
+  <p class="foot">記録はこの端末のブラウザにだけ保存されます。問題文と解説は学習用にやさしく書き直したオリジナルです（過去問の転載ではありません）。法改正があるので、受験する年の最新テキストでも確認してください（内容は2026年10月時点の法令にもとづきます）。</p>`;
   const mt=document.getElementById("mnTools");if(mt)mt.appendChild(MyNote.tools(()=>{if(S.view==="home")render()}));
 }
 
@@ -4083,8 +4100,15 @@ app.addEventListener("click",e=>{
   else if(a==="expick"){exPick(+b.dataset.v)}
   else if(a==="exnext"){exNext()}
   else if(a==="reset"){
-    if(b.dataset.sure){store={res:{},ses:{},mocks:[]};save();SRS.clear();render()}
-    else{b.dataset.sure="1";b.textContent="本当に消す？（もう一度押す）"}
+    if(confirm("全部の分野の記録（正解・まちがい、○△×の評価、復習の予定、途中の続き、模擬試験の結果）を消します。自分メモは残ります。"+ASK)){store={res:{},ses:{},mocks:[]};save();SRS.clear();render()}
+  }
+  else if(a==="resetf"){
+    const c=b.dataset.c,ids=setOf(c).map(q=>q.id),n=ids.filter(id=>store.res[id]||SRS.has(id)).length;
+    if(confirm(`「${FIELDS[c].name}」の記録（${n}問分）を消します。\n正解・まちがい、○△×の評価、復習の予定、この分野の途中の続きが消えます。自分メモは残ります。`+ASK)){clearIds(ids,Object.keys(store.ses).filter(k=>k.startsWith(c+":")));render()}
+  }
+  else if(a==="qclr"){
+    const id=S.list[S.i];
+    if(confirm("この問題の記録（正解・まちがい、○△×の評価、復習の予定）を消します。自分メモは残ります。"+ASK)){clearIds([id]);S.results=(S.results||[]).filter(r=>r.id!==id);saveSes();render()}
   }
 });
 document.addEventListener("keydown",e=>{
@@ -4102,7 +4126,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第10版（2026年10月7日更新：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第11版（2026年10月7日更新：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -4113,8 +4137,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v10").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v10").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v11").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v11").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
