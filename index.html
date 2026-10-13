@@ -332,6 +332,12 @@ details.more[open]>summary{margin-bottom:8px}
 .qno small{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px}
 .opts.pxopts{grid-template-columns:1fr!important;display:grid;gap:8px}
 .pxopts .opt span{font-family:var(--body);font-weight:500;letter-spacing:0}
+/* 2026-10-13 「ここだけ読めば大丈夫」の中の、むずかしい言葉のやさしい意味 */
+.kotoba{display:flex;flex-direction:column;gap:5px;margin:10px 0 0;padding-top:8px;border-top:1px dashed var(--line,#ddd);font-size:13.5px}
+.kotoba div{display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.kotoba dt{font-weight:700;margin:0;white-space:nowrap}
+.kotoba dt rt{font-size:10px;color:var(--muted);font-weight:400}
+.kotoba dd{margin:0;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -5947,6 +5953,232 @@ PX.forEach(p=>{const id="px-"+p.y+"-"+p.n,stw=PXSTW[id];if(!stw||p.st)return;
   const s=p.stem.replace(/([。\s])([アイウエ])[ 　]/g,"$1\u0001$2　");const parts=s.split("\u0001");
   if(parts.length-1===stw.length){p.stem=parts[0].trim();p.st=parts.slice(1).map(t=>t.trim());p.stw=stw}});
 
+/* ---------- 2026-10-13 作り直し（皮膚科4択と同じ教訓） ----------
+   ・問題数は少なく、重複なし：同じ点を問う○×は1問に（目で確かめた一覧 DEL）
+   ・過去問は模試にせず、一問一答の「ステップ4 本番形式」に組み込む（4択150問）
+     4択と同じ論点の○×（src のあるもの）は、4択の選択肢の解説で覚えられるので外す
+   ・答えのすぐ下は「ここだけ読めば大丈夫」、むずかしい言葉にはやさしい意味（kotoba.js） */
+const DEL=new Set("gyo-38 gyo-5 gyo-27 gyo-28 gyo-145 gyo-62 gyo-60 gyo-141 gyo-96 gyo-143 gyo-144 gyo-132 gyo-133 gyo-134 gyo-4 gyo-124 gyo-136 gyo-44 gyo-100 gyo-68 hou-60 hou-50 hou-87 hou-86 hou-93 hou-94 hou-95 hou-26 hou-73 hou-12 hou-54 hou-13 hou-39 hou-11 hou-89 hou-52 hou-82 hou-84 hou-56 ken-142 ken-61 ken-70 ken-114 ken-68 ken-67 ken-117 ken-86 ken-111 ken-158 zei-47 zei-49 zei-78 zei-58 zei-48 zei-11 zei-43 zei-53 zei-72 zei-42 zei-5 zei-14 zei-38 zei-39 zei-79 zei-46 zei-41 zei-4 zei-2 zei-70 zei-18 zei-74 zei-75 zei-44".split(" "));
+(function(){
+  const keep=Q.filter(q=>!q.src&&!DEL.has(q.id));
+  if(keep.length!==Q.length-DEL.size-Q.filter(q=>q.src).length)throw new Error("DEL に見つからない問題があります");
+  Q.length=0;keep.forEach(q=>Q.push(q));
+  /* 過去問と同じ論点の4択を、ステップ4（本番形式）としてコースに入れる */
+  PX.forEach(p=>Q.push({id:"px-"+p.y+"-"+p.n,c:p.c,lv:4,hi:3,mc:1,q:p.stem,st:p.st,stw:p.stw,ch:p.ch,a:p.a,why:p.why,pt:p.core,exp:"",hon:"",fig:null,y:p.y,n:p.n}));
+})();
+
+/* 2026-10-13 ユーザー「小学生が勉強してもわかるように」：「ここだけ読めば大丈夫」に出てくるむずかしい言葉の、読み方とやさしい意味
+   [ことば, よみ, いみ]。長いことばから先に探す（例：「宅建士証」は「宅建士」より先） */
+const KOTOBA=[
+["宅建業者","たっけんぎょうしゃ","家や土地の売り買い・貸し借りを、仕事としてくり返す会社や人（不動産屋さん）"],
+["宅建業","たっけんぎょう","家や土地の売り買い・貸し借りの仲だちなどを、仕事としてくり返すこと"],
+["宅建士証","たっけんしょう","宅建士であることを示すカード。5年ごとに新しくする"],
+["宅建士","たっけんし","試験に合格し、登録してカードをもらった人。大事なことをお客さんに説明する"],
+["専任","せんにん","その事務所で、ふだんからずっと働いていること"],
+["免許権者","めんきょけんしゃ","免許を出した人（国土交通大臣か都道府県知事）"],
+["免許","めんきょ","宅建業をしてよいという国や都道府県の許し"],
+["欠格","けっかく","決まりにより、免許や登録を受けられないこと"],
+["媒介","ばいかい","売りたい人と買いたい人の間をつなぐこと（仲だち）"],
+["代理","だいり","本人の代わりに、本人のために約束をすること"],
+["専属専任","せんぞくせんにん","1つの業者だけに頼み、自分で見つけた相手とも直接取引しない約束"],
+["重要事項","じゅうようじこう","契約の前に、お客さんが必ず知っておくべき大事なこと"],
+["重説","じゅうせつ","重要事項の説明のこと"],
+["37条書面","さんじゅうななじょうしょめん","契約が決まった後に渡す、契約の中身を書いた紙"],
+["35条書面","さんじゅうごじょうしょめん","契約の前に渡す、大事なこと（重要事項）を書いた紙"],
+["条書面","じょうしょめん","法律の決まり（35条・37条）で渡す紙"],
+["記名","きめい","名前を書くこと"],
+["交付","こうふ","書いたものを相手に渡すこと"],
+["書面","しょめん","紙に書いたもの（決まりによりメールなどでもよいことがある）"],
+["クーリング・オフ","くーりんぐおふ","決まった日数のうちなら、理由がなくても申し込みや契約をやめられるしくみ"],
+["営業保証金","えいぎょうほしょうきん","お客さんを守るために、業者が国の窓口（供託所）にあずけるお金"],
+["保証協会","ほしょうきょうかい","業者が入る団体。入ると、少ないお金で営業保証金の代わりになる"],
+["分担金","ぶんたんきん","保証協会に入るときに納めるお金"],
+["供託所","きょうたくしょ","お金をあずける国の窓口"],
+["供託","きょうたく","国の窓口（供託所）にお金をあずけること"],
+["還付","かんぷ","あずけたお金から、お客さんに払い戻すこと"],
+["保全措置","ほぜんそち","業者がつぶれても、あずかったお金がお客さんに戻るようにする手当て"],
+["手付","てつけ","契約のときに、買う人が先に払うお金"],
+["解約手付","かいやくてつけ","手付をあきらめれば（売る人は2倍返せば）契約をやめられる、という意味の手付"],
+["違約金","いやくきん","約束を守らなかったときに払うと決めておくお金"],
+["損害賠償","そんがいばいしょう","相手に与えた損を、お金でうめること"],
+["契約不適合","けいやくふてきごう","渡した物が、約束した中身と合っていないこと（雨もりなど）"],
+["追完","ついかん","合っていない所を直したり、足りない物を渡したりすること"],
+["報酬","ほうしゅう","仕事のお礼のお金（手数料）"],
+["貸借","たいしゃく","貸したり借りたりすること"],
+["売買","ばいばい","売ったり買ったりすること"],
+["交換","こうかん","物と物をとりかえること"],
+["業務停止","ぎょうむていし","しばらくの間、仕事をしてはいけないという命令"],
+["事務禁止","じむきんし","しばらくの間、宅建士の仕事をしてはいけないという命令"],
+["公告","こうこく","役所が、みんなに知らせること"],
+["届出","とどけで","役所に知らせること"],
+["案内所","あんないじょ","モデルルームなど、事務所以外で物件を案内する場所"],
+["従業者名簿","じゅうぎょうしゃめいぼ","働いている人の一覧表"],
+["帳簿","ちょうぼ","取引の記録を書いておくノート"],
+["取引態様","とりひきたいよう","業者が「自分で売るのか」「仲だちなのか」などの立場"],
+["建物状況調査","たてものじょうきょうちょうさ","中古の家の傷み具合を、専門家が調べること（インスペクション）"],
+["住宅性能評価","じゅうたくせいのうひょうか","家の強さや省エネなどを、決まった方法で点数にしたもの"],
+["新築住宅","しんちくじゅうたく","建ってから1年たっていない、まだだれも住んでいない家"],
+["資力確保措置","しりょくかくほそち","欠陥を直すお金を用意するため、保証金をあずけるか保険に入ること"],
+["権利金","けんりきん","借りるときに払い、あとで返ってこないお金"],
+["承諾","しょうだく","相手の申し出を受け入れること（いいよと言うこと）"],
+["第三者","だいさんしゃ","約束をした2人以外の人"],
+["善意無過失","ぜんいむかしつ","事情を知らず、知らないことに落ち度もないこと"],
+["無過失","むかしつ","落ち度がないこと"],
+["善意","ぜんい","事情を知らないこと（よい心という意味ではない）"],
+["悪意","あくい","事情を知っていること（悪い心という意味ではない）"],
+["背信的悪意者","はいしんてきあくいしゃ","わざと人を困らせるために取引する、ずるい人"],
+["対抗要件","たいこうようけん","ほかの人に「これは自分のもの」と言うために必要な手続き"],
+["対抗","たいこう","ほかの人に「これは自分のもの・自分の権利」と言えること"],
+["登記","とうき","土地や家のもち主などを、国の帳簿（登記簿）に書いてもらうこと"],
+["仮登記","かりとうき","本当の登記の前に、順番だけを取っておく登記"],
+["表題登記","ひょうだいとうき","土地や建物の場所・広さなどを、はじめて登記簿にのせること"],
+["移転登記","いてんとうき","もち主が変わったことを登記すること"],
+["取消","とりけし","いったん有効な約束を、あとからなかったことにすること"],
+["解除","かいじょ","約束（契約）をやめて、はじめからなかったことにすること"],
+["無効","むこう","はじめから効き目がないこと"],
+["有効","ゆうこう","効き目があること"],
+["詐欺","さぎ","だますこと"],
+["強迫","きょうはく","おどすこと"],
+["錯誤","さくご","かんちがい"],
+["心裡留保","しんりりゅうほ","本当はその気がないのに、わざとちがうことを言うこと（冗談など）"],
+["虚偽表示","きょぎひょうじ","相手としめし合わせてする、うその約束"],
+["無権代理","むけんだいり","頼まれていないのに、勝手に代わりに約束すること"],
+["追認","ついにん","あとから「それでいい」と認めること"],
+["表見代理","ひょうけんだいり","代理の力がないのに、あるように見えて、本人に責任が生まれること"],
+["制限行為能力","せいげんこういのうりょく","未成年など、ひとりでは大事な約束を完全にはできない立場"],
+["未成年者","みせいねんしゃ","18歳になっていない人"],
+["時効","じこう","長い時間がたつと、権利が生まれたり消えたりするしくみ"],
+["取得時効","しゅとくじこう","長く使い続けると、自分のものになるしくみ"],
+["援用","えんよう","時効の効き目を使います、と言うこと"],
+["催告","さいこく","「〇日までに〜して」と期間を決めて催促すること"],
+["債権者","さいけんしゃ","お金などを「返して・渡して」と言える人"],
+["債務者","さいむしゃ","お金などを「返す・渡す」約束をした人"],
+["債権","さいけん","お金などを「払って・渡して」と言える権利"],
+["債務","さいむ","お金などを「払う・渡す」約束（義務）"],
+["弁済","べんさい","借りたお金を返すこと"],
+["相殺","そうさい","おたがいの借りを、差し引きして終わりにすること"],
+["保証人","ほしょうにん","借りた人が返せないとき、代わりに返す約束をした人"],
+["連帯保証人","れんたいほしょうにん","借りた本人と同じように、すぐに全部を返す責任がある保証人"],
+["抗弁権","こうべんけん","相手の請求をことわれる権利"],
+["極度額","きょくどがく","保証や担保の、上限の金額"],
+["抵当権","ていとうけん","お金を借りるとき、家や土地を担保にする権利。返せないと売られる"],
+["根抵当権","ねていとうけん","上限の金額まで、何度も借りたり返したりするお金をまとめて担保にする権利"],
+["物上代位","ぶつじょうだいい","担保の家が焼けたとき、保険金などからも取り立てられること"],
+["競売","けいばい","裁判所が家や土地を売って、お金を分けること"],
+["担保","たんぽ","返せないときのために、あらかじめ差し出しておく物"],
+["請負","うけおい","家を建てるなど、仕事を完成させる約束"],
+["委任","いにん","仕事をまかせる約束"],
+["贈与","ぞうよ","タダであげること"],
+["使用貸借","しようたいしゃく","タダで貸し借りすること"],
+["賃貸借","ちんたいしゃく","お金（家賃など）を払って貸し借りすること"],
+["借地権","しゃくちけん","家を建てるために、人の土地を借りる権利"],
+["借家","しゃくや","家や部屋を借りること"],
+["定期借家","ていきしゃくや","更新がなく、期間が来たら終わる家の貸し借り"],
+["一般定期借地","いっぱんていきしゃくち","50年以上の、更新のない土地の貸し借り"],
+["事業用定期借地","じぎょうようていきしゃくち","お店などのための、更新のない土地の貸し借り"],
+["公正証書","こうせいしょうしょ","公証人という専門家に作ってもらう、しっかりした書類"],
+["正当事由","せいとうじゆう","まわりの人も納得できる、ちゃんとした理由"],
+["更新拒絶","こうしんきょぜつ","期間が終わるときに「続けません」と断ること"],
+["造作買取請求権","ぞうさくかいとりせいきゅうけん","借りた人がつけたエアコンなどを、貸した人に買ってもらう権利"],
+["必要費","ひつようひ","使うために必要な修理などのお金"],
+["有益費","ゆうえきひ","物の値打ちを上げるための工事などのお金"],
+["敷金","しききん","借りるときにあずけ、出るときに精算して返してもらうお金"],
+["原状回復","げんじょうかいふく","借りた物を、借りたときの状態に戻すこと"],
+["転貸","てんたい","借りた物を、別の人に又貸しすること"],
+["相続人","そうぞくにん","亡くなった人の財産を受けつぐ人"],
+["相続放棄","そうぞくほうき","財産も借金も、何も受けつがないと決めること"],
+["限定承認","げんていしょうにん","もらった財産の分だけ、借金を返すと決めること"],
+["単純承認","たんじゅんしょうにん","財産も借金も、全部受けつぐこと"],
+["代襲相続","だいしゅうそうぞく","子が先に亡くなっているとき、孫が代わりに受けつぐこと"],
+["法定相続分","ほうていそうぞくぶん","法律で決まっている、受けつぐ割合"],
+["遺留分","いりゅうぶん","家族に最低限残される、財産の取り分"],
+["遺言","いごん","亡くなったあとの財産の分け方などを、生きているうちに書いておくもの"],
+["自筆証書遺言","じひつしょうしょいごん","自分で手書きする遺言"],
+["遺産分割","いさんぶんかつ","受けついだ財産を、相続人で分けること"],
+["配偶者居住権","はいぐうしゃきょじゅうけん","亡くなった人の家に、つれあいがタダで住み続けられる権利"],
+["配偶者","はいぐうしゃ","夫または妻（つれあい）"],
+["検認","けんにん","家庭裁判所で、遺言書の中身を確かめる手続き"],
+["区分所有者","くぶんしょゆうしゃ","マンションの部屋のもち主"],
+["専有部分","せんゆうぶぶん","マンションの、それぞれの部屋"],
+["共用部分","きょうようぶぶん","廊下や階段など、マンションのみんなで使う所"],
+["規約","きやく","マンションの住人で決めたルール"],
+["占有者","せんゆうしゃ","マンションの部屋を借りて住んでいる人など"],
+["管理者","かんりしゃ","マンションの管理をまかされた人"],
+["共有者","きょうゆうしゃ","1つの物を何人かで一緒にもっている人"],
+["持分","もちぶん","共有している物のうち、自分の取り分の割合"],
+["共有","きょうゆう","1つの物を何人かで一緒にもつこと"],
+["市街化調整区域","しがいかちょうせいくいき","街を広げないように、建物をおさえる場所"],
+["市街化区域","しがいかくいき","すでに街か、これから10年くらいで街にしていく場所"],
+["準都市計画区域","じゅんとしけいかくくいき","都市計画区域の外で、将来困らないように決めた場所"],
+["都市計画区域","としけいかくくいき","計画的に街づくりをする場所"],
+["非線引","ひせんびき","市街化区域と市街化調整区域に分けていない都市計画区域"],
+["用途地域","ようとちいき","住宅・お店・工場など、建ててよい建物の種類を決めた場所（13種類）"],
+["地区計画","ちくけいかく","市町村が、地区ごとに細かい街づくりのルールを決めたもの"],
+["開発許可","かいはつきょか","土地を造成（宅地づくり）してよいという許し"],
+["開発行為","かいはつこうい","建物を建てるために、土地の形を大きく変えること（造成）"],
+["建築確認","けんちくかくにん","建てる前に、設計が法律に合っているか確かめてもらうこと"],
+["完了検査","かんりょうけんさ","工事が終わったあとの検査"],
+["建ぺい率","けんぺいりつ","土地の広さに対する、建物を真上から見た広さの割合"],
+["容積率","ようせきりつ","土地の広さに対する、全部の階の床の広さの合計の割合"],
+["敷地面積","しきちめんせき","建物を建てる土地の広さ"],
+["延べ面積","のべめんせき","全部の階の床の広さの合計"],
+["建築面積","けんちくめんせき","建物を真上から見た広さ"],
+["防火地域","ぼうかちいき","火事が広がらないように、とくにきびしい決まりがある場所"],
+["準防火","じゅんぼうか","防火地域の次にきびしい、火事のための決まりがある場所"],
+["耐火建築物等","たいかけんちくぶつとう","火にとても強い建物"],
+["接道義務","せつどうぎむ","建物の土地は、決まった幅の道に決まった長さだけ接していなければならない決まり"],
+["角地","かどち","2つの道の角にある土地"],
+["不算入","ふさんにゅう","計算に入れないこと"],
+["日影規制","ひかげきせい","まわりの家に長く日かげを作らないための決まり"],
+["北側斜線","きたがわしゃせん","北どなりの家の日当たりを守るための、建物の高さの決まり"],
+["建築協定","けんちくきょうてい","住人どうしで決める、建物のルール"],
+["仮換地","かりかんち","区画整理の途中で、仮に使う新しい土地"],
+["換地処分","かんちしょぶん","区画整理が終わって、新しい土地を正式に決めること"],
+["保留地","ほりゅうち","区画整理の費用にあてるため、売るために残しておく土地"],
+["事後届出","じごとどけで","土地を買った後に、役所に知らせること"],
+["権利移動","けんりいどう","農地を、だれかに売ったり貸したりすること"],
+["転用","てんよう","農地を、家を建てる土地など、ほかの使い方に変えること"],
+["農業委員会","のうぎょういいんかい","市町村にある、農地のことを決める集まり"],
+["農地","のうち","田んぼや畑として使われている土地"],
+["宅地","たくち","建物を建てるための土地"],
+["盛土","もりど","土をもって高くすること"],
+["切土","きりど","土をけずって低くすること"],
+["不動産取得税","ふどうさんしゅとくぜい","土地や家を手に入れたとき、1回だけ都道府県にはらう税金"],
+["固定資産税","こていしさんぜい","土地や家をもっていると、毎年市町村にはらう税金"],
+["登録免許税","とうろくめんきょぜい","登記をするときに国にはらう税金"],
+["印紙税","いんしぜい","契約書などに印紙をはってはらう、国の税金"],
+["記載金額","きさいきんがく","印紙税を決めるときに使う、契約書に書いてある金額"],
+["課税標準","かぜいひょうじゅん","税金を計算するときの、もとになる金額"],
+["免税点","めんぜいてん","この金額より少なければ税金がかからない、という線"],
+["非課税","ひかぜい","税金がかからないこと"],
+["特別控除","とくべつこうじょ","もうけから、決まった金額を差し引いて税金を軽くすること"],
+["譲渡所得","じょうとしょとく","土地や家を売ったときのもうけ"],
+["相続時精算課税","そうぞくじせいさんかぜい","親などからもらった財産の税金を、相続のときにまとめて計算するしくみ"],
+["地価公示","ちかこうじ","毎年1月1日の、目安となる土地の値段を国が発表するもの"],
+["不動産鑑定士","ふどうさんかんていし","土地や家の値段を決める専門家"],
+["取引事例比較法","とりひきじれいひかくほう","近くで実際に売れた値段とくらべて、値段を決める方法"],
+["収益還元法","しゅうえきかんげんほう","その土地や家が生むお金（家賃など）から、値段を決める方法"],
+["原価法","げんかほう","いま作り直すといくらかかるかから、値段を決める方法"],
+["証券化支援","しょうけんかしえん","銀行が貸した住宅ローンを買い取って、長い固定金利のローンを広めるしくみ"],
+["直接融資","ちょくせつゆうし","住宅金融支援機構が、直接お金を貸すこと"],
+["機構","きこう","住宅金融支援機構のこと。家を買う人のローンを支える国の機関"],
+["おとり広告","おとりこうこく","売るつもりのない物件で、お客さんをさそう広告"],
+["誇大広告","こだいこうこく","本当よりずっとよく見せる広告"],
+["干拓地","かんたくち","海や湖の水をぬいて作った土地。海面より低いことが多い"],
+["埋立地","うめたてち","海などを土でうめて作った土地"],
+["旧河道","きゅうかどう","昔、川が流れていた所"],
+["扇状地","せんじょうち","山のふもとに、川が運んだ土砂でできた扇の形の土地"],
+["台地","だいち","まわりより一段高い、平らな土地"],
+["段丘","だんきゅう","川や海ぞいにできた、階段のような平らな土地"],
+["裁判所","さいばんしょ","争いごとを法律で決める所"],
+["都道府県知事","とどうふけんちじ","都道府県のいちばん上の人"],
+["国土交通大臣","こくどこうつうだいじん","家・土地・道路などを担当する国の大臣"],
+["特約","とくやく","当事者どうしで特別に決める約束"],
+["当事者","とうじしゃ","約束（契約）をした本人どうし"],
+["原則","げんそく","ふつうはこう、という決まり（例外がある）"],
+["遅滞なく","ちたいなく","おくれずに、すぐに"]
+];
+
 /* ---------- 自分メモ（問題ごとのメモと画像）：3つの学習アプリで共通の部品 ----------
    使い方：MyNote.init("保存名")。問題の画面に MyNote.slot(問題ID) を入れるだけ。
    画面を描き直すたびに、空の枠を自動で見つけて中身を入れる（MutationObserver）。
@@ -6253,10 +6485,13 @@ const QNav = (() => {
    ○を重ねるほど間隔をのばす：翌日 → 3日後 → 1週間後 → 2週間後 → 1か月後 → 2か月後。
    △と×は翌日にもう一度（×は最初の段階からやり直し、△は段階を進めない）。
    同じ日に評価を付け直したときは、その日の最初の評価の前の段階から計算し直す（一覧で△に直したとき用）。
+   hold（SRS.init(保存名, {hold:true})）：復習が残っている間は「復習の日」を進めない。
+   前の復習を全部済ませるまで次の日の分は出さず、たまらない（済ませた翌日に次の1日分が出る）。
+   予定日は「復習の日」で数えるので、休んだ日の分だけ予定全体が後ろにずれる。SRS.scope(ids) で今ある問題に限る。
    SRS.init(保存名) / SRS.set(id, "ok"|"mid"|"ng") / SRS.grade(id) / SRS.isDue(id) / SRS.dueIds(ids) / SRS.seed(id, ok) */
 const SRS = (() => {
   const GAP = [1, 3, 7, 14, 30, 60];
-  let KEY = null, D = {};
+  let KEY = null, D = {}, HOLD = false, C = null, SCOPE = null;
   const css = `
 .review{margin:14px 0;padding:14px 16px;border:2px solid var(--maru,#cf3b2a);border-radius:16px;background:var(--card,#fff)}
 .review .rvhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
@@ -6275,38 +6510,52 @@ const SRS = (() => {
 .smk.ng.on{background:var(--batsu,#46566a);border-color:var(--batsu,#46566a);color:#fff}`;
   const day = t => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
   const addDays = (t, n) => { const d = new Date(t); d.setDate(d.getDate() + n); return day(d.getTime()); };
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) {} };
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(D)); if (C) localStorage.setItem(KEY + "-clock", JSON.stringify(C)); } catch (e) {} };
+  /* 復習の日：hold のときは、前の復習が残っている間は進めない（C.v＝復習の日、C.r＝最後に見た本当の日） */
+  const pending = () => Object.keys(D).some(id => (!SCOPE || SCOPE.has(id)) && D[id].due <= C.v);
+  function vt() {
+    const real = day(Date.now());
+    if (!HOLD) return real;
+    if (!C || !(C.v > 0) || !(C.r > 0) || C.r > real) { C = { v: real, r: real }; save(); return real; }
+    if (C.r < real) { while (C.r < real) { C.r = addDays(C.r, 1); if (!pending()) C.v = addDays(C.v, 1); } save(); }
+    return C.v;
+  }
   function set(id, g) {
-    const now = Date.now(), today = day(now);
+    const now = Date.now(), today = day(now), vd = vt();
     const r = D[id] || { st: 0 };
     if (r.t === undefined || day(r.t) !== today) r.base = r.st || 0;   // その日の最初の評価の前の段階
     const b = r.base || 0;
-    if (g === "ok") { r.st = Math.min(b + 1, GAP.length); r.due = addDays(today, GAP[r.st - 1]); }
-    else if (g === "mid") { r.st = b; r.due = addDays(today, 1); }
-    else { r.st = 0; r.due = addDays(today, 1); }
+    if (g === "ok") { r.st = Math.min(b + 1, GAP.length); r.due = addDays(vd, GAP[r.st - 1]); }
+    else if (g === "mid") { r.st = b; r.due = addDays(vd, 1); }
+    else { r.st = 0; r.due = addDays(vd, 1); }
     r.g = g; r.t = now; D[id] = r; save();
   }
   return {
     GAP,
-    init(key) { KEY = key; try { const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st); } catch (e) {} try { D = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { D = {}; } },
+    init(key, opt) { KEY = key; HOLD = !!(opt && opt.hold); try { C = HOLD ? JSON.parse(localStorage.getItem(KEY + "-clock") || "null") : null; } catch (e) { C = null; } try { const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st); } catch (e) {} try { D = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { D = {}; } },
     set,
+    scope(ids) { SCOPE = new Set(ids); },
+    /* 復習の日（hold でなければ今日）。今日の復習の続きを保存する名前に使う */
+    vday: () => vt(),
+    /* 本当の日より遅れている日数（前の復習が残っていて止まっている日数） */
+    held: () => Math.round((day(Date.now()) - vt()) / 864e5),
     has: id => !!D[id],
     grade: id => (D[id] && D[id].g) || "",
     stage: id => (D[id] && D[id].st) || 0,
     /* 今日（または前から）予定日になっている問題 */
-    isDue: id => !!(D[id] && D[id].due <= day(Date.now())),
-    dueIds(ids) { const t = day(Date.now()); return ids.filter(id => D[id] && D[id].due <= t).sort((a, b) => ({ ng: 0, mid: 1, ok: 2 }[D[a].g] - { ng: 0, mid: 1, ok: 2 }[D[b].g]) || D[a].due - D[b].due); },
+    isDue: id => !!(D[id] && D[id].due <= vt()),
+    dueIds(ids) { const t = vt(); return ids.filter(id => D[id] && D[id].due <= t).sort((a, b) => ({ ng: 0, mid: 1, ok: 2 }[D[a].g] - { ng: 0, mid: 1, ok: 2 }[D[b].g]) || D[a].due - D[b].due); },
     /* 明日・1週間以内に予定がある問題の数 */
-    upcoming(ids) { const t = day(Date.now()), t1 = addDays(t, 1), t7 = addDays(t, 7); let a = 0, w = 0; ids.forEach(id => { const r = D[id]; if (!r || r.due <= t) return; if (r.due <= t1) a++; if (r.due <= t7) w++; }); return { tomorrow: a, week: w }; },
+    upcoming(ids) { const t = vt(), t1 = addDays(t, 1), t7 = addDays(t, 7); let a = 0, w = 0; ids.forEach(id => { const r = D[id]; if (!r || r.due <= t) return; if (r.due <= t1) a++; if (r.due <= t7) w++; }); return { tomorrow: a, week: w }; },
     /* 今日つけた評価か */
     today: id => !!(D[id] && day(D[id].t) === day(Date.now())),
     /* この部品を入れる前の記録（○×だけ）から予定を作る：×は今日、○は3日後 */
-    seed(id, ok) { if (D[id]) return; const t = day(Date.now()); D[id] = ok ? { st: 1, g: "ok", due: addDays(t, 3), t: 0 } : { st: 0, g: "ng", due: t, t: 0 }; },
+    seed(id, ok) { if (D[id]) return; const t = vt(); D[id] = ok ? { st: 1, g: "ok", due: addDays(t, 3), t: 0 } : { st: 0, g: "ng", due: t, t: 0 }; },
     seedRaw(id, r) { if (!D[id]) D[id] = r; },
     /* 次に出す日の説明（「明日」「3日後」など） */
-    nextLabel(id) { const r = D[id]; if (!r) return ""; const n = Math.round((r.due - day(Date.now())) / 864e5); return n <= 0 ? "今日" : n === 1 ? "明日" : n === 7 ? "1週間後" : n === 14 ? "2週間後" : n === 30 ? "1か月後" : n === 60 ? "2か月後" : n + "日後"; },
+    nextLabel(id) { const r = D[id]; if (!r) return ""; const n = Math.round((r.due - vt()) / 864e5); return n <= 0 ? "今日" : n === 1 ? "明日" : n === 7 ? "1週間後" : n === 14 ? "2週間後" : n === 30 ? "1か月後" : n === 60 ? "2か月後" : n + "日後"; },
     flush: save,
-    clear() { D = {}; save(); },
+    clear() { D = {}; if (C) C = { v: day(Date.now()), r: day(Date.now()) }; save(); },
     /* 指定した問題の予定だけ消す（分野ごと・1問ごとのリセット） */
     del(ids) { ids.forEach(id => { delete D[id]; }); save(); },
     dump: () => D
@@ -6377,10 +6626,16 @@ const Edit = (() => {
 
 Edit.init("takken-ox-edits");
 /* ---------- レベル・並び ---------- */
-const LV={1:{name:"基礎",sub:"ことばとしくみ"},2:{name:"標準",sub:"よく出るルール"},3:{name:"合格レベル",sub:"本番でまちがえやすい所"}};
+const LV={1:{name:"基礎",sub:"ことばとしくみ"},2:{name:"標準",sub:"よく出るルール"},3:{name:"合格レベル",sub:"本番でまちがえやすい所"},4:{name:"本番形式",sub:"過去問と同じ論点の4択"}};
 const ORDER=["gyo","ken","hou","zei"];
-const num=id=>+id.split("-")[1];
-Q.sort((a,b)=>ORDER.indexOf(a.c)-ORDER.indexOf(b.c)||a.lv-b.lv||num(a.id)-num(b.id));
+const num=id=>{const q=typeof QI!=="undefined"&&QI[id];return q&&q.mc?q.n:+id.split("-")[1]};
+/* 並び：レベル（基礎→標準→合格→本番形式）ごとに、分野の順、同じテーマ（図）の問題を続けて */
+const FIGO={};Q.forEach((q,i)=>{const k=q.c+":"+(q.fig||"");if(!(k in FIGO))FIGO[k]=i});
+Q.sort((a,b)=>ORDER.indexOf(a.c)-ORDER.indexOf(b.c)||a.lv-b.lv||(a.mc?(a.y<b.y?1:a.y>b.y?-1:a.n-b.n):FIGO[a.c+":"+(a.fig||"")]-FIGO[b.c+":"+(b.fig||"")]||+a.id.split("-")[1]-+b.id.split("-")[1]));
+/* むずかしい言葉に、やさしい意味をつける（kotoba.js） */
+const KOTOBA_S=KOTOBA.slice().sort((a,b)=>b[0].length-a[0].length);
+function kotobaOf(t){t=String(t||"").replace(/<[^>]+>/g,"");const hit=[];for(const k of KOTOBA_S){if(hit.length>=5)break;const i=t.indexOf(k[0]);if(i<0)continue;hit.push(k);t=t.split(k[0]).join("\u0000")}return hit}
+function kotobaHtml(t){const h=kotobaOf(t);return h.length?`<dl class="kotoba">${h.map(k=>`<div><dt><ruby>${k[0]}<rt>${k[1]}</rt></ruby></dt><dd>${k[2]}</dd></div>`).join("")}</dl>`:""}
 const QI={};Q.forEach(q=>QI[q.id]=q);
 const stars=n=>"★".repeat(n)+"☆".repeat(3-n);
 const isFalseHon=q=>/（→ 誤り）$/.test(q.hon);
@@ -6480,15 +6735,13 @@ function selfMarkHtml(id){
 /* ---------- 基本から順に（基礎→標準→合格レベル→過去問、8割で次へ） ---------- */
 const lvAll=l=>Q.filter(q=>q.lv===l);
 function pathHtml(){
-  const st=[1,2,3].map(l=>{const qs=lvAll(l),ok=qs.filter(isOk).length;return{l,n:qs.length,ok,p:Math.round(ok/qs.length*100)}});
-  const cur=(st.find(x=>x.p<80)||{l:4}).l;
-  const pxb=Object.keys(PXY).map(y=>store.pxbest&&store.pxbest[y]?store.pxbest[y].score:null);
-  return `<section class="path"><h2>基本から順に、合格レベルへ</h2>
-  <p class="pnote">前の段階で<b>8割</b>正解したら次へ進みます。正解した問題も、忘れかけたころに「今日の復習」に出ます。</p>
-  <ol class="psteps">${st.map(x=>`<li class="pstep ${x.l===cur?"cur":x.p>=80?"done":""}"><span class="lvdot l${x.l}">${x.l}</span><div class="pbody"><b>${LV[x.l].name}<small>${LV[x.l].sub}</small></b>
+  const st=[1,2,3,4].map(l=>{const qs=lvAll(l),ok=qs.filter(isOk).length;return{l,n:qs.length,ok,p:Math.round(ok/qs.length*100)}});
+  const cur=(st.find(x=>x.p<80)||{l:0}).l;
+  return `<section class="path"><h2>基本から順に、合格レベルへ（全${Q.length}問）</h2>
+  <p class="pnote">上から順に進めます。前の段階で<b>8割</b>正解したら次へ。ステップ4は、過去問（令和5〜7年度）と同じ論点の4択です。正解した問題も、忘れかけたころに「今日の復習」に出ます。</p>
+  <ol class="psteps">${st.map(x=>`<li class="pstep ${x.l===cur?"cur":x.p>=80?"done":""}"><span class="lvdot l${Math.min(x.l,3)}">${x.l}</span><div class="pbody"><b>${LV[x.l].name}<small>${LV[x.l].sub}</small></b>
     <div class="meter" aria-hidden="true"><i style="width:${x.p}%"></i></div><span class="pst">正解 ${x.ok} / ${x.n}問（${x.p}%）${x.p>=80?"　8割達成":""}</span></div>
-    <button class="btn ${x.l===cur?"":"sub"}" data-act="path" data-lv="${x.l}">${validSes("path:"+x.l)?"続きから":"解く"}</button></li>`).join("")}
-    <li class="pstep ${cur===4?"cur":""}"><span class="lvdot l3">4</span><div class="pbody"><b>過去問と同じ論点の4択<small>令和5〜7年度・各50問</small></b><span class="pst">${pxb.map((v,i)=>`${PXY[Object.keys(PXY)[i]].name}：${v===null?"まだ":v+"点"}`).join("　")}</span></div><a class="btn ${cur===4?"":"sub"}" href="#pxsec">下へ</a></li></ol></section>`;
+    <button class="btn ${x.l===cur?"":"sub"}" data-act="path" data-lv="${x.l}">${validSes("path:"+x.l)?"続きから":"解く"}</button></li>`).join("")}</ol></section>`;
 }
 function pathList(l){const qs=lvAll(l);const notyet=qs.filter(q=>!isOk(q));return ORDER.flatMap(c=>notyet.filter(q=>q.c===c)).map(q=>q.id)}
 /* ---------- 過去問と同じ論点の4択（年度別50問。文章は作り直し） ---------- */
@@ -6562,7 +6815,7 @@ function home(){
   app.innerHTML=header()+`
   <section class="hero">
     <h1>毎日<span class="ox">20問</span>で、宅建の合格ラインへ。</h1>
-    <p>全${Q.length}問。まちがえた問題と忘れかけた問題を、ちょうどよい間隔で自動的に出し直します。何をやるか迷ったら「今日のおすすめ」だけでOKです。</p>
+    <p>全${Q.length}問（○×${Q.filter(q=>!q.mc).length}問＋過去問と同じ論点の4択${Q.filter(q=>q.mc).length}問）。まちがえた問題と忘れかけた問題を、ちょうどよい間隔で自動的に出し直します。何をやるか迷ったら「今日のおすすめ」だけでOKです。</p>
   </section>
   <section class="today">
     <div class="tdhead"><span class="tdlbl">今日のおすすめ</span><span class="tdsub">${tl?`途中から：全${tl.list.length}問のうち次は${nextNo(tl)}問目`:`復習 ${Math.min(dueN,12)}問 ＋ 新しい問題 ${tlist.length-Math.min(dueN,12)}問`}</span></div>
@@ -6577,34 +6830,23 @@ function home(){
   </section>
   ${searchHtml()}
   ${reviewHtml()}
-  ${exSes?`<section class="resume"><h2>続きから解く（本番形式）</h2><div class="resitem" style="--fc:var(--maru)"><span class="t">本番形式の模試 50問<small>全50問のうち${exSes.i}問を解答ずみ</small></span><button class="btn" data-act="exresume">続きから</button><button class="ghost" data-act="exdrop">やめる</button></div></section>`:""}
+  ${false?`<section class="resume"><h2>続きから解く（本番形式）</h2><div class="resitem" style="--fc:var(--maru)"><span class="t">本番形式の模試 50問<small>全50問のうち${exSes.i}問を解答ずみ</small></span><button class="btn" data-act="exresume">続きから</button><button class="ghost" data-act="exdrop">やめる</button></div></section>`:""}
   ${resumeKeys.length?`<section class="resume"><h2>続きから解く</h2>${resumeKeys.map(k=>{const v=store.ses[k];const pos=v.i+(v.picked!==null?1:0);return `
       <div class="resitem" style="--fc:${keyColor(k)}"><span class="t">${keyName(k)}<small>全${v.list.length}問のうち${pos}問を解答ずみ。次は${nextNo(v)}問目から</small></span>
       <button class="btn" data-act="resume" data-k="${k}">続きから</button><button class="ghost" data-act="drop" data-k="${k}" aria-label="${keyName(k)}の途中の記録を消す">やめる</button></div>`}).join("")}</section>`:""}
-  <section class="exam">
-    <h2>本番と同じ形で解く</h2>
-    <p>本番は4つの文から選ぶ形式です。○×で覚えたことを、本番の形で使えるか確かめます。</p>
-    <div class="row">
-      <button class="btn" data-act="ex10">4択で10問</button>
-      <button class="btn sub" data-act="ex50">本番形式の模試 50問（2時間）</button>
-    </div>
-    ${lastMock?`<p class="est">前回の模試：<b>${lastMock.score}点</b> / 50点（${lastMock.date}）</p>`:""}
-  </section>
   ${pathHtml()}
-  ${pxHomeHtml()}
   <h2 class="sec">分野・レベルを選んで解く</h2>
   <div class="fields">${ORDER.map(k=>{const f=FIELDS[k],s=stat(setOf(k));return `
     <section class="field" style="--fc:${f.color}">
       <span class="tag">${f.tag}・本番${f.exam}問</span><h3>${f.name}</h3><p>${f.desc}</p>
       <div class="meter" aria-hidden="true"><i style="width:${Math.round(s.m/s.n*100)}%"></i></div>
       <span class="stat"><span>覚えた ${s.m} / ${s.n}問</span></span>
-      <div class="lvls">${[1,2,3].map(l=>{const ls=stat(setOf(k,l));const full=ls.ok===ls.n&&ls.n>0;return `
+      <div class="lvls">${[1,2,3,4].map(l=>{const ls=stat(setOf(k,l));const full=ls.ok===ls.n&&ls.n>0;return `
         <button class="lvbtn" data-act="lv" data-c="${k}" data-lv="${l}">
-          <span class="lvdot l${l}">${l}</span><span class="nm">${LV[l].name}<small>${ls.n}問</small></span>
+          <span class="lvdot l${Math.min(l,3)}">${l}</span><span class="nm">${LV[l].name}<small>${ls.n}問</small></span>
           <span class="sc">${validSes(k+":"+l)?`<b class="done">続きは${nextNo(store.ses[k+":"+l])}問目から</b>`:full?'<b class="done">クリア</b>':ls.done?`正解 ${ls.ok}/${ls.n}`:"まだ"}</span></button>`}).join("")}</div>
     </section>`}).join("")}</div>
   <div class="row">
-    <button class="btn sub" data-act="mock">○×で本番の配分50問</button>
     <button class="btn sub" data-act="all">全${Q.length}問シャッフル</button>
     <button class="btn sub" data-act="wrong" ${w?"":"disabled"}>まちがえた問題（${w}問）</button>
     <button class="btn sub" data-act="memo" ${MyNote.ids().some(id=>QI[id])?"":"disabled"}>メモした問題（${MyNote.ids().filter(id=>QI[id]).length}問）</button>
@@ -6624,7 +6866,7 @@ function home(){
     </div>
     <div class="legend">${ORDER.map(k=>FIELDS[k]).map(f=>`<div><i style="background:${f.color}"></i>${f.name}<b>${f.exam}問</b></div>`).join("")}</div>
     <p style="margin-top:10px"><b>少ない労力で合格する使い方</b></p>
-    <p>① 毎日「今日のおすすめ」を1回（20問・15〜20分）。まちがえた問題と忘れかけた問題が、自動で出し直されます。<br>② 1週間に1回「4択で10問」、慣れてきたら「本番形式の模試」で実力を確かめる。<br>③ 模試で35点をこえるまで、①と②をくり返す。</p>
+    <p>① 「基本から順に」をステップ1から進める（各ステップ8割で次へ）。<br>② 毎日、最初に「今日の復習」をすませる。まちがえた問題と忘れかけた問題が、ちょうどよい間隔で出ます。<br>③ ステップ4（過去問と同じ論点の4択）で8割をこえたら、本番の力がついています。</p>
     <p>★の数は「本番でよく出る度合い」です。おすすめは、★の多い所・基礎から順に出します。いちばん点を取りやすいのは<b>宅建業法</b>（20問）です。</p>
     <p><b>統計</b>の問題（毎年1問）は、<b>2026年度（令和8年度）試験用</b>の数字（地価公示・住宅着工・法人企業統計・宅建業者数・土地取引件数）を「税・その他」に入れています。数字は毎年変わります。この版は2026年度試験用です。</p>
   </details>
@@ -6661,29 +6903,30 @@ function srcHtml(q){if(!q.src)return"";const p=PXI["px-"+q.src.replace("-","-")]
 function quiz(){
   const q=QI[S.list[S.i]];const f=FIELDS[q.c];const answered=S.picked!==null;
   const ok=answered&&(S.picked===q.a);
-  let out=header()+`<div class="qhead" style="--fc:${f.color}"><span class="fl">${f.name}</span><span class="chip l${q.lv}">${LV[q.lv].name}</span><span class="hi" title="本番でよく出る度合い">${stars(q.hi)}</span><span class="n">${S.i+1} / ${S.list.length}</span></div>
+  let out=header()+`<div class="qhead" style="--fc:${f.color}"><span class="fl">${f.name}</span><span class="chip l${Math.min(q.lv,3)}">${LV[q.lv].name}</span><span class="hi" title="本番でよく出る度合い">${stars(q.hi)}</span><span class="n">${S.i+1} / ${S.list.length}</span></div>
   <div class="meter" aria-hidden="true"><i style="width:${(S.i+(answered?1:0))/S.list.length*100}%;background:${f.color}"></i></div>
   <div class="qtools">${S.i>0?`<button class="ghost back" data-act="prev">← 前の問題</button>`:"<span></span>"}${S.key&&(S.i>0||answered)?`<button class="ghost" data-act="restart">このセットを最初からやり直す</button>`:""}</div>
   <article class="qcard" style="--fc:${f.color}">
-    <div class="qno">${S.label}　○か×か？${answered&&S.i+1<S.list.length&&S.picks[S.i+1]!==undefined?`<span class="seen">（解き終わった問題を見ています）</span>`:""}</div>
+    <div class="qno">${S.label}　${q.mc?`4つから選ぶ（${PXY[q.y].name} 問${q.n}と同じ論点）`:"○か×か？"}${answered&&S.i+1<S.list.length&&S.picks[S.i+1]!==undefined?`<span class="seen">（解き終わった問題を見ています）</span>`:""}</div>
     <div class="qtext">${q.q}</div>
-    <div class="choices">
+    ${q.mc?`${q.st?`<ol class="stl kana">${q.st.map((t,i)=>`<li${answered?` class="${/^○/.test(q.stw[i])?"st":"sf"}"`:""}><span class="tx">${t}${answered?`<b class="tv">${q.stw[i]}</b>`:""}</span></li>`).join("")}</ol>`:""}<div class="opts pxopts">${q.ch.map((c,i)=>`<button class="opt ${answered?(i===q.a?"right":(i===S.picked?"wrongpick":"dim")):""}" data-act="mpick" data-v="${i}" ${answered?"disabled":""}><b>${i+1}</b><span>${c}</span></button>`).join("")}</div>`:`<div class="choices">
       <button class="choice o ${answered?(S.picked===true?"picked":"dim"):""}" data-act="pick" data-v="1" ${answered?"disabled":""}><span class="mk">○</span><span class="lb">正しい</span></button>
       <button class="choice x ${answered?(S.picked===false?"picked":"dim"):""}" data-act="pick" data-v="0" ${answered?"disabled":""}><span class="mk">×</span><span class="lb">まちがい</span></button>
-    </div>`;
-  if(!answered){out+=`<div class="kbd">キーボードなら O / X で答えられます</div>${MyNote.slot(q.id)}</article>`;app.innerHTML=out;return}
+    </div>`}`;
+  if(!answered){out+=`<div class="kbd">キーボードなら ${q.mc?"1〜4":"O / X"} で答えられます</div>${MyNote.slot(q.id)}</article>`;app.innerHTML=out;return}
   const r=rec(q.id);const nextTxt=ok?`次は${SRS.nextLabel(q.id)}の復習にもう一度出します`:"まちがえた問題は、明日の復習にもう一度出します";
-  out+=`<div class="verdict ${ok?"ok":"ng"}" role="status"><span class="big">${ok?"○":"×"}</span><div><h3>${ok?"正解！":"ざんねん"}</h3><p>この文は「<b>${q.a?"○ 正しい":"× まちがい"}</b>」です。${nextTxt}</p></div></div>
+  out+=`<div class="verdict ${ok?"ok":"ng"}" role="status"><span class="big">${ok?"○":"×"}</span><div><h3>${ok?"正解！":"ざんねん"}</h3><p>${q.mc?`正解は「<b>${q.a+1}</b>」です。`:`この文は「<b>${q.a?"○ 正しい":"× まちがい"}</b>」です。`}${nextTxt}</p></div></div>
     <div class="exp">
-      <div class="corebox"><span class="lbl">核心</span>${q.pt}</div>
-      ${!q.a&&q.ng?`<div class="ngbox"><span class="lbl">どこがちがう</span>${q.ng}</div>`:""}
-      <div class="hon"><span class="lbl">本番の試験では、こんな書き方で出ます</span>「${honText(q)}」<br><b>→ ${isFalseHon(q)?"誤り":"正しい"}</b></div>
-      ${figHtml(q)}
+      <div class="corebox"><span class="lbl">ここだけ読めば大丈夫</span>${q.pt}${kotobaHtml(q.pt+(q.ng||""))}</div>
+      ${q.mc?`<ol class="pxwhy">${q.why.map((w,i)=>w==="×"?"":`<li class="${i===q.a?"r":""}"><span class="no">${i+1}</span><span>${w}</span></li>`).join("")}</ol>`:""}
+      ${!q.mc&&!q.a&&q.ng?`<div class="ngbox"><span class="lbl">どこがちがう</span>${q.ng}</div>`:""}
       ${goroHtml(q)}
-      <details class="more"><summary>詳しく（解説${q.w?"・ことば":""}）</summary>
+      ${q.mc?"":`<details class="more"><summary>もっと詳しく（読まなくても合格できます：図・解説・本番での書き方${q.w?"・ことば":""}）</summary>
+        <div class="hon"><span class="lbl">本番の試験では、こんな書き方で出ます</span>「${honText(q)}」<br><b>→ ${isFalseHon(q)?"誤り":"正しい"}</b></div>
+        ${figHtml(q)}
         ${Edit.box(q.id,q.exp)}
         ${q.w?`<h4>ことばメモ</h4><dl class="words">${q.w.map(w=>`<div><dt><ruby>${w[0]}<rt>${w[1]}</rt></ruby></dt><dd>${w[2]}</dd></div>`).join("")}</dl>`:""}
-      </details>
+      </details>`}
       ${srcHtml(q)}
       ${MyNote.slot(q.id)}
     </div>
@@ -6699,8 +6942,8 @@ function end(){
   const rate=n?ok/n:0;
   const msg=ok===n?"全問正解！ この調子で次へ進みましょう。":rate>=.8?"合格ラインの力がついています。まちがえた所は、明日以降の「今日のおすすめ」に自動で出てきます。":rate>=.6?"あと少し。まちがえた問題は、自動で復習に回ります。":"だいじょうぶ。まちがえた問題は自動で復習に回るので、くり返せば必ず覚えられます。";
   let nextBtn="";
-  if(S.from&&S.from.path){const l=S.from.lv,qs=lvAll(l),p=Math.round(qs.filter(isOk).length/qs.length*100);nextBtn=p>=80&&l<3?`<button class="btn" data-act="path" data-lv="${l+1}">8割達成！ 次は「${LV[l+1].name}」へ</button>`:p>=80?`<a class="btn" href="#pxsec" data-act="home">8割達成！ 過去問と同じ論点の4択へ</a>`:`<p style="margin:0">「${LV[l].name}」の正解率は${p}%。8割をこえたら次の段階へ進みましょう。</p>`}
-  else if(S.from&&S.from.lv<3){const nl=S.from.lv+1;nextBtn=`<button class="btn${miss.length?" sub":""}" data-act="lv" data-c="${S.from.c}" data-lv="${nl}">次は「${LV[nl].name}」へ</button>`}
+  if(S.from&&S.from.path){const l=S.from.lv,qs=lvAll(l),p=Math.round(qs.filter(isOk).length/qs.length*100);nextBtn=p>=80&&l<4?`<button class="btn" data-act="path" data-lv="${l+1}">8割達成！ 次は「${LV[l+1].name}」へ</button>`:p>=80?`<p style="margin:0">全部のステップで8割達成！ あとは毎日の「今日の復習」で忘れないようにしましょう。</p>`:`<p style="margin:0">「${LV[l].name}」の正解率は${p}%。8割をこえたら次の段階へ進みましょう。</p>`}
+  else if(S.from&&S.from.lv<4){const nl=S.from.lv+1;nextBtn=`<button class="btn${miss.length?" sub":""}" data-act="lv" data-c="${S.from.c}" data-lv="${nl}">次は「${LV[nl].name}」へ</button>`}
   app.innerHTML=header()+`<section class="end">
     <span class="qhead">${S.label} の結果</span>
     <div class="score">${ok}<small> / ${n}問</small></div>
@@ -6846,6 +7089,7 @@ app.addEventListener("click",e=>{
   else if(a==="srun"){const ids=searchHits(SQ);if(ids.length)start(ids,"検索："+SQ)}
   else if(a==="sclear"){SQ="";render()}
   else if(a==="pick"){pick(b.dataset.v==="1")}
+  else if(a==="mpick"){pick(+b.dataset.v)}
   else if(a==="next"){next()}
   else if(a==="prev"){prev()}
   else if(a==="review"){S.key=null;S.i=+b.dataset.i;S.picked=S.picks[S.i]!==undefined?S.picks[S.i]:null;S.view="quiz";render();window.scrollTo(0,0)}
@@ -6887,7 +7131,7 @@ document.addEventListener("keydown",e=>{
   const k=e.key.toLowerCase();
   if(k==="arrowleft"){if(S.view==="quiz")prev();else if(S.view==="exam")exPrev();else if(S.view==="px")pxPrev();return}
   if(S.view==="quiz"){
-    if(S.picked===null){if(k==="o"||k==="1")pick(true);else if(k==="x"||k==="2")pick(false)}
+    if(S.picked===null){const q=QI[S.list[S.i]];if(q.mc){if(/^[1-4]$/.test(k))pick(+k-1)}else if(k==="o"||k==="1")pick(true);else if(k==="x"||k==="2")pick(false)}
     else if(k==="enter"||k==="n"||k===" "){if(document.activeElement&&document.activeElement.id!=="nextBtn"){e.preventDefault();next()}}
   }else if(S.view==="px"&&store.pxs){
     const P=store.pxs,p=PXI[P.list[P.i]];
@@ -6900,7 +7144,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第15版（2026年10月7日更新：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第16版（2026年10月13日更新：問題を作り直し。重複をまとめ、過去問と同じ論点の4択を「基本から順に」のステップ4に組み込み、答えのすぐ下に「ここだけ読めば大丈夫」とむずかしい言葉のやさしい意味。第15版：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -6911,8 +7155,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v15").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v15").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v16").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v16").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
