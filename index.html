@@ -338,6 +338,10 @@ details.more[open]>summary{margin-bottom:8px}
 .kotoba dt{font-weight:700;margin:0;white-space:nowrap}
 .kotoba dt rt{font-size:10px;color:var(--muted);font-weight:400}
 .kotoba dd{margin:0;color:var(--muted)}
+/* 2026-10-13 ユーザー「周辺知識等は折り畳まないで」：解説・図・本番での書き方を、はじめから開いて見せる */
+.around{display:flex;flex-direction:column;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.around>.lbl{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.around h4{margin:4px 0 0;font-size:14px}
 </style>
 </head>
 <body>
@@ -6921,12 +6925,12 @@ function quiz(){
       ${q.mc?`<ol class="pxwhy">${q.why.map((w,i)=>w==="×"?"":`<li class="${i===q.a?"r":""}"><span class="no">${i+1}</span><span>${w}</span></li>`).join("")}</ol>`:""}
       ${!q.mc&&!q.a&&q.ng?`<div class="ngbox"><span class="lbl">どこがちがう</span>${q.ng}</div>`:""}
       ${goroHtml(q)}
-      ${q.mc?"":`<details class="more"><summary>もっと詳しく（読まなくても合格できます：図・解説・本番での書き方${q.w?"・ことば":""}）</summary>
+      ${q.mc?"":`<div class="around"><span class="lbl">周辺知識（解説・図・本番での書き方）</span>
         <div class="hon"><span class="lbl">本番の試験では、こんな書き方で出ます</span>「${honText(q)}」<br><b>→ ${isFalseHon(q)?"誤り":"正しい"}</b></div>
         ${figHtml(q)}
         ${Edit.box(q.id,q.exp)}
         ${q.w?`<h4>ことばメモ</h4><dl class="words">${q.w.map(w=>`<div><dt><ruby>${w[0]}<rt>${w[1]}</rt></ruby></dt><dd>${w[2]}</dd></div>`).join("")}</dl>`:""}
-      </details>`}
+      </div>`}
       ${srcHtml(q)}
       ${MyNote.slot(q.id)}
     </div>
@@ -7144,7 +7148,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第16版（2026年10月13日更新：問題を作り直し。重複をまとめ、過去問と同じ論点の4択を「基本から順に」のステップ4に組み込み、答えのすぐ下に「ここだけ読めば大丈夫」とむずかしい言葉のやさしい意味。第15版：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第17版（2026年10月13日更新：解説・図・本番での書き方を「周辺知識」としてはじめから表示。第16版：問題を作り直し。重複をまとめ、過去問と同じ論点の4択を「基本から順に」のステップ4に組み込み、答えのすぐ下に「ここだけ読めば大丈夫」とむずかしい言葉のやさしい意味。第15版：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -7155,8 +7159,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v16").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v16").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v17").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v17").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
