@@ -6634,7 +6634,12 @@ const LV={1:{name:"基礎",sub:"ことばとしくみ"},2:{name:"標準",sub:"�
 const ORDER=["gyo","ken","hou","zei"];
 const num=id=>{const q=typeof QI!=="undefined"&&QI[id];return q&&q.mc?q.n:+id.split("-")[1]};
 /* 並び：レベル（基礎→標準→合格→本番形式）ごとに、分野の順、同じテーマ（図）の問題を続けて */
-const FIGO={};Q.forEach((q,i)=>{const k=q.c+":"+(q.fig||"");if(!(k in FIGO))FIGO[k]=i});
+/* 教科書の順（章＝分野 → 単元）。2026-10-13 皮膚科での指摘「系統立てて学べる順に」を宅建にも */
+const UNIT={gyo:"gyoTable menkyo kekkaku haigyo kigen torishi hosho hoshoK baikai koukoku hoshu tl t3537 j35 hasshu tetsuke hozen cooling kashi kantoku",
+  ken:"seigen ishi sagi dairi jiko nijuu touki kyoyu sourin teitou hoshoT saimu keiyaku tetsuke futeki shakuchi kubun fuho souzoku iryu",
+  hou:"toshi chiiki youto kaihatsu kakunin setsudo dorosha kenpei boka kijun kokudo nouchi morido kanchi",
+  zei:"zei menzei joto chika kantei kikou hyouji toho toukei tochi tatemono"};
+const FIGO={};Object.entries(UNIT).forEach(([c,v])=>v.split(" ").forEach((f,i)=>FIGO[c+":"+f]=i));Q.forEach(q=>{const k=q.c+":"+(q.fig||"");if(!(k in FIGO))FIGO[k]=99});
 Q.sort((a,b)=>ORDER.indexOf(a.c)-ORDER.indexOf(b.c)||a.lv-b.lv||(a.mc?(a.y<b.y?1:a.y>b.y?-1:a.n-b.n):FIGO[a.c+":"+(a.fig||"")]-FIGO[b.c+":"+(b.fig||"")]||+a.id.split("-")[1]-+b.id.split("-")[1]));
 /* むずかしい言葉に、やさしい意味をつける（kotoba.js） */
 const KOTOBA_S=KOTOBA.slice().sort((a,b)=>b[0].length-a[0].length);
@@ -7148,7 +7153,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第17版（2026年10月13日更新：解説・図・本番での書き方を「周辺知識」としてはじめから表示。第16版：問題を作り直し。重複をまとめ、過去問と同じ論点の4択を「基本から順に」のステップ4に組み込み、答えのすぐ下に「ここだけ読めば大丈夫」とむずかしい言葉のやさしい意味。第15版：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第18版（2026年10月13日更新：問題を教科書の順（章→単元）に並べ直し、答えの画面の折りたたみをなくした。第17版：解説・図・本番での書き方を「周辺知識」としてはじめから表示。第16版：問題を作り直し。重複をまとめ、過去問と同じ論点の4択を「基本から順に」のステップ4に組み込み、答えのすぐ下に「ここだけ読めば大丈夫」とむずかしい言葉のやさしい意味。第15版：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -7159,8 +7164,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v17").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v17").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v18").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v18").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
