@@ -5963,6 +5963,8 @@ PX.forEach(p=>{const id="px-"+p.y+"-"+p.n,stw=PXSTW[id];if(!stw||p.st)return;
      4択と同じ論点の○×（src のあるもの）は、4択の選択肢の解説で覚えられるので外す
    ・答えのすぐ下は「ここだけ読めば大丈夫」、むずかしい言葉にはやさしい意味（kotoba.js） */
 const DEL=new Set("gyo-38 gyo-5 gyo-27 gyo-28 gyo-145 gyo-62 gyo-60 gyo-141 gyo-96 gyo-143 gyo-144 gyo-132 gyo-133 gyo-134 gyo-4 gyo-124 gyo-136 gyo-44 gyo-100 gyo-68 hou-60 hou-50 hou-87 hou-86 hou-93 hou-94 hou-95 hou-26 hou-73 hou-12 hou-54 hou-13 hou-39 hou-11 hou-89 hou-52 hou-82 hou-84 hou-56 ken-142 ken-61 ken-70 ken-114 ken-68 ken-67 ken-117 ken-86 ken-111 ken-158 zei-47 zei-49 zei-78 zei-58 zei-48 zei-11 zei-43 zei-53 zei-72 zei-42 zei-5 zei-14 zei-38 zei-39 zei-79 zei-46 zei-41 zei-4 zei-2 zei-70 zei-18 zei-74 zei-75 zei-44".split(" "));
+/* 2026-10-14 ユーザー「重複は減らして、なるべく問題数は絞って」：過去問の4択の選択肢と同じ論点の○×を外す（基礎の問題は入口として残す） */
+"gyo-103 gyo-106 gyo-113 gyo-120 gyo-126 gyo-128 gyo-131 gyo-137 gyo-142 gyo-146 gyo-25 gyo-29 gyo-30 gyo-39 gyo-42 gyo-43 gyo-45 gyo-47 gyo-51 gyo-61 gyo-72 gyo-87 gyo-88 gyo-89 hou-22 hou-27 hou-28 hou-34 hou-42 hou-51 hou-55 hou-61 hou-65 hou-72 hou-77 hou-79 hou-81 hou-92 hou-98 ken-113 ken-128 ken-129 ken-132 ken-133 ken-134 ken-150 ken-22 ken-31 ken-36 ken-37 ken-46 ken-47 ken-48 ken-51 ken-53 ken-77 ken-82 ken-87 ken-91 ken-94 ken-98 zei-16 zei-17 zei-20 zei-28 zei-33 zei-35 zei-51 zei-56 zei-63 zei-73 zei-83 zei-84 zei-85 zei-86 zei-87 zei-88".split(" ").forEach(id=>DEL.add(id));
 (function(){
   const keep=Q.filter(q=>!q.src&&!DEL.has(q.id));
   if(keep.length!==Q.length-DEL.size-Q.filter(q=>q.src).length)throw new Error("DEL に見つからない問題があります");
@@ -7153,7 +7155,7 @@ document.addEventListener("keydown",e=>{
 });
 render();
 </script>
-<p class="offline">第18版（2026年10月13日更新：問題を教科書の順（章→単元）に並べ直し、答えの画面の折りたたみをなくした。第17版：解説・図・本番での書き方を「周辺知識」としてはじめから表示。第16版：問題を作り直し。重複をまとめ、過去問と同じ論点の4択を「基本から順に」のステップ4に組み込み、答えのすぐ下に「ここだけ読めば大丈夫」とむずかしい言葉のやさしい意味。第15版：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
+<p class="offline">第19版（2026年10月14日更新：過去問の4択と同じ論点の○×をまとめ、問題数を492問に。第18版：問題を教科書の順（章→単元）に並べ直し、答えの画面の折りたたみをなくした。第17版：解説・図・本番での書き方を「周辺知識」としてはじめから表示。第16版：問題を作り直し。重複をまとめ、過去問と同じ論点の4択を「基本から順に」のステップ4に組み込み、答えのすぐ下に「ここだけ読めば大丈夫」とむずかしい言葉のやさしい意味。第15版：令和5〜7年度の過去問と同じ論点の4択（年度別50問）と○×約350問を追加、解説を「核心→どこがちがう→詳しく」の形に、基本から順に進む道筋（8割で次へ）。第14版：解説を自分で編集できるように、ホームの下で書き出し・読み込み。第13版：ホームのいちばん下に「共有」ボタン。第12版：文字検索、問題画面の下の「リセット」（この問題／この単元を選ぶ）。第11版：分野ごと・1問ごとに記録を消せるように（確認つき）。第10版：○△×の評価を付けた問題は「解いた」扱いに。第9版：ホームに「今日の復習」（エビングハウスの忘却曲線）、問題ごとの○△×の評価、一覧から評価を変更。第8版：進み具合のバーで問題を移動・長押しで問題の一覧。第7版：区分所有法の2026年改正・相隣関係・共有などの権利関係、業法・法令・税の論点、2026年度試験用の統計を追加。問題ごとの自分メモ・画像に対応）</p>
 <p class="offline" id="offline">オフライン利用：準備中…</p>
 <script>
 (function(){
@@ -7164,8 +7166,8 @@ render();
   var hadCtrl=!!navigator.serviceWorker.controller,reloaded=false;
   navigator.serviceWorker.addEventListener("controllerchange",function(){if(hadCtrl&&!reloaded){reloaded=true;location.reload()}});
   navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(function(r){try{r.update()}catch(e){}return r}).then(function(){return navigator.serviceWorker.ready}).then(function(){
-    return caches.open("takken-ox-v18").then(function(c){return c.match("index.html")})
-  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v18").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
+    return caches.open("takken-ox-v19").then(function(c){return c.match("index.html")})
+  }).then(function(hit){if(hit)ok();else setTimeout(function(){caches.open("takken-ox-v19").then(function(c){return c.match("index.html")}).then(function(h){h?ok():el.textContent="オフライン利用：もう一度開くと準備されます"})},2500)})
   .catch(function(){el.textContent="オフライン利用：準備できませんでした（通信を確認して開き直してください）"});
 })();
 </script>
